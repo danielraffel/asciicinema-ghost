@@ -1,6 +1,8 @@
 # asciinema-ghost
 
-A tiny, single-file tool to scrub Asciinema casts, grab precise start/end times, and generate Ghost-friendly embed snippets.
+A tiny, single-file site to scrub Asciinema casts, grab precise start/end times, and generate Ghost-friendly embed snippets. Built around https://asciinema.org.
+
+Hosted version: https://www.generouscorp.com/asciicinema-ghost/
 
 ## What it does
 
@@ -32,6 +34,7 @@ References:
 
 - https://ghost.org/help/post-settings/#code-injection
 - https://ghost.org/help/cards/#html
+- Example embed: https://danielraffel.me/2026/01/06/learning-claude-code-plugins-by-building-two/
 
 ## Why a local server?
 
@@ -74,4 +77,4 @@ python3 server.py --no-fetch
 
 ## Appendix: hosting vs. Python
 
-Running a local Python server is optional. Most people can just host `index.html` on any static site and use it from a URL (for example: https://www.generouscorp.com/asciicinema-output/). Python is only useful if you want a quick local server or offline asset downloads.
+Running a local Python server is optional. Most people can just host `index.html` on any static site and use it from a URL (for example: https://www.generouscorp.com/asciicinema-ghost/). Python is only useful if you want a quick local server or offline asset downloads.
