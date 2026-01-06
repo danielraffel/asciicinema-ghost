@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>asciinema clip + ghost embed tool</title>
+
+  <!-- local first, then CDN fallback -->
+  <link rel="stylesheet" href="./asciinema-player.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/asciinema-player@3.14.0/dist/bundle/asciinema-player.css" />
+
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    .wrap { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
+    header {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      display:flex; gap:12px; align-items:center;
+    }
+    header .hint { opacity: 0.8; font-size: 12px; }
+    #player { padding: 14px; min-height: 0; overflow: hidden; position: relative; }
+    #player .ap-player { max-width: 100%; max-height: 100%; }
+    #player .player-empty {
+      position: absolute;
+      inset: 14px;
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      opacity: 0.65;
+      pointer-events: none;
+      text-align: center;
+      gap: 6px;
+    }
+
+    .panel {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      width: min(560px, calc(100vw - 24px));
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 12px;
+      background: rgba(15,15,15,0.92);
+      backdrop-filter: blur(10px);
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+    }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+    .row + .row { margin-top: 10px; }
+    .grow { flex: 1 1 auto; }
+    .kpi { font-variant-numeric: tabular-nums; font-size: 12px; opacity: 0.9; }
+    label { font-size: 12px; opacity: 0.85; display:block; margin-bottom: 4px; }
+    input[type="text"], select, textarea {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: inherit;
+      outline: none;
+    }
+    select { min-width: 220px; }
+    textarea { width: 100%; min-height: 140px; resize: vertical; }
+    input.small { width: 190px; }
+    input.mono, textarea.mono, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    button {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      color: inherit;
+      cursor: pointer;
+      user-select: none;
+    }
+    button:hover { background: rgba(255,255,255,0.12); }
+    button.primary { background: rgba(255,255,255,0.16); }
+    button.danger { background: rgba(255,80,80,0.16); border-color: rgba(255,80,80,0.22); }
+    .sep { height: 1px; background: rgba(255,255,255,0.12); margin: 10px 0; }
+    .small { font-size: 12px; opacity: 0.8; }
+    .pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+    }
+    .hidden { display: none !important; }
+    .dropzone {
+      border: 1px dashed rgba(255,255,255,0.24);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(255,255,255,0.03);
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    .dropzone strong { font-weight: 600; }
+    .dropzone .note { opacity: 0.75; }
+    .dropzone.dragover {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.06);
+    }
+    .floating {
+      position: fixed;
+      right: 12px;
+      bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15,15,15,0.92);
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    }
+    .twoCol { display:grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 10px; align-items:end; }
+    .urlBox {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.07);
+    }
+    .urlBox input[type="text"] { width: 100%; }
+    .urlBox .urlHint { color: rgba(255,255,255,0.85); }
+    .urlBox .urlHint strong { font-weight: 600; }
+    .urlBox input[type="text"].highlight {
+      border-color: rgba(255,255,255,0.35);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
+    }
+    .kbd {
+      padding: 1px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: rgba(255,255,255,0.06);
+    }
+    .muted { opacity: 0.75; }
+    .mini { font-size: 11px; opacity: 0.75; }
+    .codebox {
+      white-space: pre-wrap;
+      margin: 0;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div><strong>asciinema clip + ghost embed tool</strong></div>
+      <div class="hint grow">Scrub, then use “Insert current → Start/End”. Shortcuts: <span class="kbd">Alt/Option+S</span> start, <span class="kbd">Alt/Option+E</span> end, <span class="kbd">Alt/Option+H</span> panel.</div>
+      <div class="hint mono pill" id="status">loading…</div>
+    </header>
+
+    <div id="player"></div>
+
+    <button class="floating hidden" id="showPanelBtn">Show controls <span class="kbd">Alt/Option+H</span></button>
+
+    <div class="panel" id="panel">
+      <div class="row">
+        <div class="grow kpi">
+          <div>Current: <span class="mono" id="curTime">–</span></div>
+          <div>Duration: <span class="mono" id="durTime">–</span></div>
+        </div>
+        <button id="hidePanelBtn">Hide <span class="kbd">Alt/Option+H</span></button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div class="grow">
+          <label>Cast</label>
+          <div class="row">
+            <select id="castSelect"></select>
+            <button id="deleteCastBtn" class="danger">Delete</button>
+          </div>
+          <div class="mini mono muted" id="castMeta">–</div>
+        </div>
+      </div>
+
+      <div class="twoCol urlBox">
+        <div>
+          <label>Add cast URL (.cast)</label>
+          <input class="mono" type="text" id="addUrlInput" placeholder="https://…/something.cast" />
+          <div class="mini muted urlHint">Paste a URL and press Enter or click Add. <strong>Use a URL to export Ghost snippets.</strong></div>
+        </div>
+        <button id="addUrlBtn" class="primary">Add</button>
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        <strong>Drag & drop local <span class="mono">.cast</span> files</strong> to preview.
+        <div class="note">Local files will not export to Ghost snippets. Use a URL to embed.</div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div class="grow">
+          <label>Start (timecode or seconds)</label>
+          <input class="mono small" type="text" id="startTcInput" placeholder="hh:mm:ss.mmm or seconds" />
+          <div class="mini">Seconds: <span class="mono" id="startSeconds">–</span></div>
+        </div>
+        <button class="primary" id="insertStartBtn">Insert current → Start <span class="kbd">Alt/Option+S</span></button>
+        <button id="seekStartBtn">Seek start</button>
+        <button id="clearStartBtn" class="danger">Clear</button>
+      </div>
+
+      <div class="row">
+        <div class="grow">
+          <label>End (timecode or seconds)</label>
+          <input class="mono small" type="text" id="endTcInput" placeholder="hh:mm:ss.mmm or seconds" />
+          <div class="mini">Seconds: <span class="mono" id="endSeconds">–</span></div>
+        </div>
+        <button class="primary" id="insertEndBtn">Insert current → End <span class="kbd">Alt/Option+E</span></button>
+        <button id="seekEndBtn">Seek end</button>
+        <button id="clearEndBtn" class="danger">Clear</button>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="playSelBtn">Play selection</button>
+        <button id="loopSelBtn">Loop: off</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="copyCfgBtn">Copy config</button>
+      </div>
+
+      <div class="row">
+        <button id="applyMarkersBtn">Apply markers to player</button>
+        <button id="hidePlayerControlsBtn">Player controls: off</button>
+        <button id="showPlayerControlsBtn" class="hidden">Player controls: on</button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div class="grow">
+          <label>Config snippet (current cast)</label>
+          <pre class="codebox mono small" id="configSnippet"></pre>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="grow">
+          <label>Ghost snippets (all URL casts)</label>
+          <div class="mini muted">Only URL casts are included (local files are for preview).</div>
+          <div class="mini muted">URL casts: <span class="mono" id="urlCastCount">0</span></div>
+          <div class="mini mono muted" id="urlCastList">–</div>
+          <textarea class="mono small" id="ghostText" spellcheck="false"></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="downloadGhostBtn">Download Ghost snippets</button>
+        <button id="copyGhostBtn">Copy Ghost snippets</button>
+      </div>
+
+      <div class="row">
+        <button id="downloadProjectBtn">Download project JSON</button>
+        <button id="importProjectBtn">Import project JSON</button>
+        <button id="clearProjectBtn" class="danger">Clear project data</button>
+        <input type="file" id="importProjectFile" accept="application/json" class="hidden" />
+      </div>
+
+      <div class="small">
+        Stored locally in your browser (<span class="mono">localStorage</span>) + exportable as JSON.
+      </div>
+    </div>
+  </div>
+
+  <script src="./asciinema-player.min.js"></script>
+  <script>
+    function ensurePlayerReady() {
+      if (window.AsciinemaPlayer) return Promise.resolve(true);
+      return new Promise((resolve) => {
+        const existing = document.getElementById("asciinemaPlayerCdn");
+        if (existing) {
+          existing.addEventListener("load", () => resolve(!!window.AsciinemaPlayer));
+          existing.addEventListener("error", () => resolve(false));
+          return;
+        }
+        const s = document.createElement("script");
+        s.id = "asciinemaPlayerCdn";
+        s.src = "https://cdn.jsdelivr.net/npm/asciinema-player@3.14.0/dist/bundle/asciinema-player.min.js";
+        s.onload = () => resolve(!!window.AsciinemaPlayer);
+        s.onerror = () => resolve(false);
+        document.head.appendChild(s);
+      });
+    }
+    function copyTextCompat(text) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      return new Promise((resolve, reject) => {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.top = "-9999px";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          ok ? resolve() : reject(new Error("execCommand copy failed"));
+        } catch (e) { reject(e); }
+      });
+    }
+
+    function isNum(x) { return typeof x === "number" && Number.isFinite(x); }
+    function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+    function isEditableTarget(el) {
+      if (!el) return false;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+      return !!el.isContentEditable;
+    }
+
+    function parseTimecodeToSeconds(input) {
+      if (input == null) return null;
+      const s = String(input).trim();
+      if (!s) return null;
+
+      if (!s.includes(":")) {
+        const n = Number(s);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      const parts = s.split(":").map(p => p.trim());
+      if (parts.length < 2 || parts.length > 3) return null;
+
+      let hh = 0, mm = 0, ss = 0;
+
+      if (parts.length === 2) {
+        mm = Number(parts[0]);
+        ss = Number(parts[1]);
+        if (!Number.isFinite(mm) || !Number.isFinite(ss)) return null;
+      } else {
+        hh = Number(parts[0]);
+        mm = Number(parts[1]);
+        ss = Number(parts[2]);
+        if (!Number.isFinite(hh) || !Number.isFinite(mm) || !Number.isFinite(ss)) return null;
+      }
+
+      if (mm < 0 || ss < 0 || hh < 0) return null;
+      return (hh * 3600) + (mm * 60) + ss;
+    }
+
+    function fmtTimecode(sec) {
+      if (!isNum(sec)) return "–";
+      const s = Math.max(0, sec);
+      const hh = Math.floor(s / 3600);
+      const mm = Math.floor((s % 3600) / 60);
+      const ss = Math.floor(s % 60);
+      const ms = Math.floor((s - Math.floor(s)) * 1000);
+      const pad2 = (x) => String(x).padStart(2, "0");
+      const pad3 = (x) => String(x).padStart(3, "0");
+      return `${pad2(hh)}:${pad2(mm)}:${pad2(ss)}.${pad3(ms)}`;
+    }
+
+    const STORAGE_KEY = "asciinema_clip_tool_project_v1";
+    function randomId() { return Math.random().toString(16).slice(2, 10); }
+    function normalizeUrl(u) { return String(u || "").trim(); }
+    function focusUrlInputIfEmpty() {
+      if (!addUrlInput) return;
+      const hasCast = project.casts.some(c => c.type === "url" && c.src && c.src.startsWith("http"));
+      if (hasCast) return;
+      if (!addUrlInput.value) {
+        addUrlInput.classList.add("highlight");
+        addUrlInput.focus();
+        addUrlInput.select();
+        setTimeout(() => addUrlInput.classList.remove("highlight"), 1200);
+      }
+    }
+
+    function guessLabelFromSrc(src) {
+      try {
+        const url = new URL(src);
+        const last = url.pathname.split("/").filter(Boolean).pop() || "cast";
+        return decodeURIComponent(last);
+      } catch (_) {
+        const last = String(src).split("/").filter(Boolean).pop() || "cast";
+        return last;
+      }
+    }
+
+    function makeCastFromUrl(url) {
+      const src = normalizeUrl(url);
+      return { id: randomId(), label: guessLabelFromSrc(src), type: "url", src, start: null, end: null, controls: "auto", playerControls: true };
+    }
+
+    function makeCastFromFile(file) {
+      const objUrl = URL.createObjectURL(file);
+      return { id: randomId(), label: file.name || "local.cast", type: "file", src: objUrl, fileName: file.name || "local.cast", start: null, end: null, controls: "auto", playerControls: true };
+    }
+
+    function loadProject() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.casts) || !parsed.casts.length) return null;
+        return parsed;
+      } catch (_) { return null; }
+    }
+
+    function saveProject() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(project)); } catch (_) {}
+    }
+
+    const defaultProject = { activeId: null, casts: [] };
+    let project = loadProject() || defaultProject;
+    if (!project.activeId && project.casts.length) project.activeId = project.casts[0].id;
+
+    let player = null;
+    let playerDuration = null;
+    let loop = false;
+    let rafId = null;
+
+    const elStatus = document.getElementById("status");
+    const elCur = document.getElementById("curTime");
+    const elDur = document.getElementById("durTime");
+    const elPanel = document.getElementById("panel");
+    const showPanelBtn = document.getElementById("showPanelBtn");
+    const hidePanelBtn = document.getElementById("hidePanelBtn");
+
+    const castSelect = document.getElementById("castSelect");
+    const deleteCastBtn = document.getElementById("deleteCastBtn");
+    const castMeta = document.getElementById("castMeta");
+    const addUrlInput = document.getElementById("addUrlInput");
+    const addUrlBtn = document.getElementById("addUrlBtn");
+    const dropzone = document.getElementById("dropzone");
+
+    const startTcInput = document.getElementById("startTcInput");
+    const endTcInput = document.getElementById("endTcInput");
+    const startSeconds = document.getElementById("startSeconds");
+    const endSeconds = document.getElementById("endSeconds");
+
+    const insertStartBtn = document.getElementById("insertStartBtn");
+    const insertEndBtn = document.getElementById("insertEndBtn");
+    const seekStartBtn = document.getElementById("seekStartBtn");
+    const seekEndBtn = document.getElementById("seekEndBtn");
+    const clearStartBtn = document.getElementById("clearStartBtn");
+    const clearEndBtn = document.getElementById("clearEndBtn");
+
+    const playSelBtn = document.getElementById("playSelBtn");
+    const loopSelBtn = document.getElementById("loopSelBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const copyCfgBtn = document.getElementById("copyCfgBtn");
+
+    const applyMarkersBtn = document.getElementById("applyMarkersBtn");
+    const hidePlayerControlsBtn = document.getElementById("hidePlayerControlsBtn");
+    const showPlayerControlsBtn = document.getElementById("showPlayerControlsBtn");
+
+    const configSnippet = document.getElementById("configSnippet");
+    const ghostText = document.getElementById("ghostText");
+    const urlCastCount = document.getElementById("urlCastCount");
+    const urlCastList = document.getElementById("urlCastList");
+    const downloadGhostBtn = document.getElementById("downloadGhostBtn");
+    const copyGhostBtn = document.getElementById("copyGhostBtn");
+
+    const downloadProjectBtn = document.getElementById("downloadProjectBtn");
+    const importProjectBtn = document.getElementById("importProjectBtn");
+    const clearProjectBtn = document.getElementById("clearProjectBtn");
+    const importProjectFile = document.getElementById("importProjectFile");
+
+    function getActiveCast() {
+      return project.casts.find(c => c.id === project.activeId) || null;
+    }
+
+    function renderCastSelect() {
+      castSelect.innerHTML = "";
+      if (!project.casts.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "No casts yet";
+        opt.disabled = true;
+        opt.selected = true;
+        castSelect.appendChild(opt);
+        return;
+      }
+      for (const c of project.casts) {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = c.label || "(unnamed cast)";
+        if (c.id === project.activeId) opt.selected = true;
+        castSelect.appendChild(opt);
+      }
+    }
+
+    function setActiveCast(id) {
+      if (!project.casts.some(c => c.id === id)) return;
+      project.activeId = id;
+      saveProject();
+      renderCastSelect();
+      mountActiveCast();
+      renderAllSnippets();
+    }
+
+    function deleteCast(id) {
+      const idx = project.casts.findIndex(c => c.id === id);
+      if (idx === -1) return;
+      const cast = project.casts[idx];
+      if (cast.type === "file" && cast.src && cast.src.startsWith("blob:")) {
+        try { URL.revokeObjectURL(cast.src); } catch (_) {}
+      }
+      project.casts.splice(idx, 1);
+      project.activeId = project.casts.length ? project.casts[0].id : null;
+      saveProject();
+      renderCastSelect();
+      mountActiveCast();
+      renderAllSnippets();
+    }
+
+    function normalizeRangeOnCast(cast) {
+      if (!cast) return;
+      if (isNum(playerDuration)) {
+        if (isNum(cast.start)) cast.start = clamp(cast.start, 0, playerDuration);
+        if (isNum(cast.end)) cast.end = clamp(cast.end, 0, playerDuration);
+      }
+      if (isNum(cast.start) && isNum(cast.end) && cast.end < cast.start) {
+        const t = cast.start; cast.start = cast.end; cast.end = t;
+      }
+    }
+
+    function updateInputsFromCast(cast) {
+      if (!cast) return;
+      startTcInput.value = isNum(cast.start) ? fmtTimecode(cast.start) : "";
+      endTcInput.value = isNum(cast.end) ? fmtTimecode(cast.end) : "";
+      startSeconds.textContent = isNum(cast.start) ? cast.start.toFixed(2) : "–";
+      endSeconds.textContent = isNum(cast.end) ? cast.end.toFixed(2) : "–";
+      const src = cast.src || "";
+      const shortSrc = src.length > 90 ? src.slice(0, 40) + "…" + src.slice(-40) : src;
+      castMeta.textContent = `id=${cast.id}  type=${cast.type}  src=${shortSrc || "—"}`;
+    }
+
+    function updateCastFromInputs() {
+      const cast = getActiveCast();
+      if (!cast) return;
+      const s = parseTimecodeToSeconds(startTcInput.value);
+      const e = parseTimecodeToSeconds(endTcInput.value);
+      cast.start = isNum(s) ? s : null;
+      cast.end = isNum(e) ? e : null;
+      normalizeRangeOnCast(cast);
+      saveProject();
+      updateInputsFromCast(cast);
+      renderCurrentConfigSnippet();
+      renderGhostSnippets();
+    }
+
+    function buildMarkersForCast(cast) {
+      if (!cast) return [];
+      if (isNum(cast.start) && isNum(cast.end)) return [[cast.start, "Start"], [cast.end, "End"]];
+      return [];
+    }
+
+    function mountPlayerWithCast(cast, opts = {}) {
+      if (!cast || !window.AsciinemaPlayer) return;
+
+      clearPlayer();
+
+      const container = document.getElementById("player");
+      container.innerHTML = "";
+
+      player = AsciinemaPlayer.create(cast.src, container, {
+        preload: true,
+        fit: "both",
+        controls: cast.playerControls !== false,
+        ...opts
+      });
+
+      elStatus.textContent = "loading…";
+      const durPoll = setInterval(async () => {
+        try {
+          const d = await player.getDuration();
+          if (isNum(d)) {
+            clearInterval(durPoll);
+            playerDuration = d;
+            elDur.textContent = `${d.toFixed(2)}s  (${fmtTimecode(d)})`;
+            elStatus.textContent = "ready";
+            normalizeRangeOnCast(cast);
+            saveProject();
+            updateInputsFromCast(cast);
+            renderAllSnippets();
+          }
+        } catch (_) {}
+      }, 200);
+
+      player.addEventListener("play", () => elStatus.textContent = "play");
+      player.addEventListener("playing", () => elStatus.textContent = "playing");
+      player.addEventListener("pause", () => elStatus.textContent = "pause");
+      player.addEventListener("ended", () => elStatus.textContent = "ended");
+
+      startEnforcer();
+    }
+
+    function mountActiveCast() {
+      const cast = getActiveCast();
+      if (!cast) {
+        clearPlayer();
+        elStatus.textContent = "add a .cast URL or drop a file";
+        elDur.textContent = "–";
+        updateInputsFromCast({ start: null, end: null, id: "—", type: "—", src: "" });
+        renderAllSnippets();
+        return;
+      }
+
+      if (!window.AsciinemaPlayer) {
+        elStatus.textContent = "loading player...";
+        elDur.textContent = "–";
+        updateInputsFromCast(cast);
+        renderAllSnippets();
+        return;
+      }
+
+      if (cast.type === "url" && (!cast.src || !cast.src.startsWith("http"))) {
+        elStatus.textContent = "add a .cast URL";
+        elDur.textContent = "–";
+        updateInputsFromCast(cast);
+        renderAllSnippets();
+        return;
+      }
+
+      mountPlayerWithCast(cast, {});
+      updateInputsFromCast(cast);
+      renderAllSnippets();
+
+      if (cast.playerControls === false) {
+        hidePlayerControlsBtn.classList.add("hidden");
+        showPlayerControlsBtn.classList.remove("hidden");
+      } else {
+        hidePlayerControlsBtn.classList.remove("hidden");
+        showPlayerControlsBtn.classList.add("hidden");
+      }
+    }
+
+    function stopEnforcer() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    function clearPlayer() {
+      if (player && player.dispose) {
+        try { player.dispose(); } catch (_) {}
+      }
+      player = null;
+      playerDuration = null;
+      const container = document.getElementById("player");
+      container.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "player-empty";
+      empty.innerHTML = [
+        "<div>In the sidebar, paste a .cast URL or use the dropzone for local preview.</div>",
+        "<div class=\"mini\">Shortcuts: <span class=\"kbd\">Alt/Option+S</span> start, <span class=\"kbd\">Alt/Option+E</span> end, <span class=\"kbd\">Alt/Option+H</span> toggle panel.</div>"
+      ].join("");
+      container.appendChild(empty);
+    }
+
+    function startEnforcer() {
+      stopEnforcer();
+      const tick = async () => {
+        try {
+          const cast = getActiveCast();
+          if (player && cast && isNum(cast.end) && isNum(cast.start)) {
+            const t = await player.getCurrentTime();
+            if (isNum(t) && t >= cast.end) {
+              if (loop) player.seek(cast.start).then(() => player.play());
+              else player.pause();
+            }
+          }
+        } catch (_) {}
+        rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }
+
+    function renderCurrentConfigSnippet() {
+      const cast = getActiveCast();
+      if (!cast) { configSnippet.textContent = ""; return; }
+
+      const s = isNum(cast.start) ? cast.start.toFixed(2) : "null";
+      const e = isNum(cast.end) ? cast.end.toFixed(2) : "null";
+
+      const markers = (isNum(cast.start) && isNum(cast.end))
+        ? `markers: [[${cast.start.toFixed(2)}, "Start"], [${cast.end.toFixed(2)}, "End"]]`
+        : `markers: []`;
+
+      configSnippet.textContent =
+`// AsciinemaPlayer.create(src, element, opts)
+{
+  startAt: ${isNum(cast.start) ? cast.start.toFixed(2) : 0},
+  controls: "auto",
+  ${markers}
+}
+
+// picked range:
+start = ${s}  (${fmtTimecode(cast.start)})
+end   = ${e}  (${fmtTimecode(cast.end)})`;
+    }
+
+    function safeDivIdForCast(cast) {
+      return `cast-${cast.id}`;
+    }
+
+    function buildGhostSnippetsText() {
+      const urlCasts = project.casts.filter(c => c.type === "url" && c.src && c.src.startsWith("http"));
+      const fileCasts = project.casts.filter(c => c.type === "file");
+
+      const contentParts = [];
+      for (const c of urlCasts) {
+        contentParts.push(`<div id="${safeDivIdForCast(c)}"></div>`);
+        contentParts.push(`<div style="height:16px"></div>`);
+      }
+      if (contentParts.length) contentParts.pop();
+
+      const header =
+`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/asciinema-player@3.14.0/dist/bundle/asciinema-player.css">`;
+
+      const footerLines = [];
+      // build script tags WITHOUT embedding "</script" in THIS file
+      footerLines.push(`<scr` + `ipt src="https://cdn.jsdelivr.net/npm/asciinema-player@3.14.0/dist/bundle/asciinema-player.min.js"></scr` + `ipt>`);
+      footerLines.push(`<scr` + `ipt>`);
+      footerLines.push(`(function () {`);
+      footerLines.push(`  if (!window.AsciinemaPlayer) return;`);
+
+      for (const c of urlCasts) {
+        const divId = safeDivIdForCast(c);
+        const markers = buildMarkersForCast(c);
+        const startAt = isNum(c.start) ? c.start : 0;
+
+        footerLines.push(`  var el_${c.id} = document.getElementById(${JSON.stringify(divId)});`);
+        footerLines.push(`  if (el_${c.id}) {`);
+        footerLines.push(`    AsciinemaPlayer.create(`);
+        footerLines.push(`      ${JSON.stringify(c.src)},`);
+        footerLines.push(`      el_${c.id},`);
+        footerLines.push(`      {`);
+        footerLines.push(`        startAt: ${Number(startAt).toFixed(2)},`);
+        footerLines.push(`        controls: "auto",`);
+        if (markers.length) {
+          footerLines.push(`        markers: [[${markers[0][0].toFixed(2)}, "Start"], [${markers[1][0].toFixed(2)}, "End"]]`);
+        } else {
+          footerLines.push(`        markers: []`);
+        }
+        footerLines.push(`      }`);
+        footerLines.push(`    );`);
+        footerLines.push(`  }`);
+      }
+
+      if (fileCasts.length) {
+        footerLines.push(`  // NOTE: local file casts omitted (Ghost can't fetch blob: URLs).`);
+      }
+
+      footerLines.push(`})();`);
+      footerLines.push(`</scr` + `ipt>`);
+
+      const footer = footerLines.join("\n");
+
+      return [
+        `POST CONTENT (HTML card):`,
+        contentParts.join("\n\n") || `<!-- No URL casts yet (local files are not included) -->`,
+        ``,
+        `POST HEADER INJECTION:`,
+        header,
+        ``,
+        `POST FOOTER INJECTION:`,
+        footer
+      ].join("\n");
+    }
+
+    function renderGhostSnippets() { ghostText.value = buildGhostSnippetsText(); }
+    function renderUrlCastCount() {
+      const urlCasts = project.casts.filter(c => c.type === "url" && c.src && c.src.startsWith("http"));
+      urlCastCount.textContent = String(urlCasts.length);
+      if (!urlCasts.length) {
+        urlCastList.textContent = "–";
+        return;
+      }
+      urlCastList.textContent = urlCasts.map(c => c.src).join(" | ");
+    }
+    function renderAllSnippets() { renderCurrentConfigSnippet(); renderGhostSnippets(); renderUrlCastCount(); }
+
+    function downloadTextFile(filename, text) {
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+    }
+
+    function togglePanel() {
+      const isHidden = elPanel.classList.contains("hidden");
+      if (isHidden) {
+        elPanel.classList.remove("hidden");
+        showPanelBtn.classList.add("hidden");
+      } else {
+        elPanel.classList.add("hidden");
+        showPanelBtn.classList.remove("hidden");
+      }
+    }
+
+    hidePanelBtn.addEventListener("click", () => togglePanel());
+    showPanelBtn.addEventListener("click", () => togglePanel());
+
+    document.addEventListener("keydown", (e) => {
+      if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (isEditableTarget(e.target)) return;
+      const key = String(e.key || "").toLowerCase();
+      if (key === "s") {
+        e.preventDefault();
+        insertCurrentStart();
+      } else if (key === "e") {
+        e.preventDefault();
+        insertCurrentEnd();
+      } else if (key === "h") {
+        e.preventDefault();
+        togglePanel();
+      }
+    });
+
+    castSelect.addEventListener("change", () => setActiveCast(castSelect.value));
+    deleteCastBtn.addEventListener("click", () => deleteCast(project.activeId));
+
+    addUrlBtn.addEventListener("click", () => {
+      const url = normalizeUrl(addUrlInput.value);
+      if (!url) {
+        elStatus.textContent = "enter a URL";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+        return;
+      }
+      if (!url.startsWith("http")) {
+        elStatus.textContent = "URL must start with http";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+        return;
+      }
+      const c = makeCastFromUrl(url);
+      project.casts.push(c);
+      project.activeId = c.id;
+      addUrlInput.value = "";
+      saveProject();
+      renderCastSelect();
+      mountActiveCast();
+      renderAllSnippets();
+      elStatus.textContent = "URL cast added";
+      setTimeout(() => (elStatus.textContent = "ready"), 1200);
+    });
+    addUrlInput.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      addUrlBtn.click();
+    });
+
+    function handleFiles(files) {
+      const list = Array.from(files || []);
+      if (!list.length) return;
+      for (const f of list) {
+        const c = makeCastFromFile(f);
+        project.casts.push(c);
+        project.activeId = c.id;
+      }
+      saveProject();
+      renderCastSelect();
+      mountActiveCast();
+    }
+
+    ["dragenter", "dragover"].forEach(ev => {
+      dropzone.addEventListener(ev, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.add("dragover");
+      });
+    });
+    ["dragleave", "drop"].forEach(ev => {
+      dropzone.addEventListener(ev, (e) => {
+        e.preventDefault(); e.stopPropagation();
+        dropzone.classList.remove("dragover");
+      });
+    });
+    dropzone.addEventListener("drop", (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) handleFiles(dt.files);
+    });
+
+    startTcInput.addEventListener("change", updateCastFromInputs);
+    endTcInput.addEventListener("change", updateCastFromInputs);
+
+    insertStartBtn.addEventListener("click", async () => {
+      await insertCurrentStart();
+    });
+
+    async function insertCurrentStart() {
+      const cast = getActiveCast();
+      if (!cast || !player) return;
+      const t = await player.getCurrentTime();
+      if (!isNum(t)) return;
+      cast.start = t;
+      normalizeRangeOnCast(cast);
+      saveProject();
+      updateInputsFromCast(cast);
+      renderAllSnippets();
+    }
+
+    insertEndBtn.addEventListener("click", async () => {
+      await insertCurrentEnd();
+    });
+
+    async function insertCurrentEnd() {
+      const cast = getActiveCast();
+      if (!cast || !player) return;
+      const t = await player.getCurrentTime();
+      if (!isNum(t)) return;
+      cast.end = t;
+      normalizeRangeOnCast(cast);
+      saveProject();
+      updateInputsFromCast(cast);
+      renderAllSnippets();
+    }
+
+    seekStartBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast || !player) return;
+      updateCastFromInputs();
+      if (isNum(cast.start)) player.seek(cast.start);
+    });
+
+    seekEndBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast || !player) return;
+      updateCastFromInputs();
+      if (isNum(cast.end)) player.seek(cast.end);
+    });
+
+    clearStartBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast) return;
+      cast.start = null;
+      saveProject();
+      updateInputsFromCast(cast);
+      renderAllSnippets();
+    });
+
+    clearEndBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast) return;
+      cast.end = null;
+      saveProject();
+      updateInputsFromCast(cast);
+      renderAllSnippets();
+    });
+
+    playSelBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast || !player) return;
+      updateCastFromInputs();
+      if (isNum(cast.start)) player.seek(cast.start).then(() => player.play());
+      else player.play();
+    });
+
+    loopSelBtn.addEventListener("click", () => {
+      loop = !loop;
+      loopSelBtn.textContent = `Loop: ${loop ? "on" : "off"}`;
+      const cast = getActiveCast();
+      if (loop && cast && player && isNum(cast.start)) player.seek(cast.start).then(() => player.play());
+    });
+
+    pauseBtn.addEventListener("click", () => { if (player) player.pause(); });
+
+    copyCfgBtn.addEventListener("click", async () => {
+      renderCurrentConfigSnippet();
+      const text = configSnippet.textContent || "";
+      try {
+        await copyTextCompat(text);
+        elStatus.textContent = "copied";
+        setTimeout(() => (elStatus.textContent = "ready"), 900);
+      } catch (_) {
+        elStatus.textContent = "copy failed";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+      }
+    });
+
+    applyMarkersBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast) return;
+      updateCastFromInputs();
+      if (!cast.src) return;
+      mountPlayerWithCast(cast, {
+        startAt: isNum(cast.start) ? cast.start : 0,
+        markers: buildMarkersForCast(cast),
+        controls: cast.playerControls !== false
+      });
+      renderAllSnippets();
+    });
+
+    hidePlayerControlsBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast) return;
+      cast.playerControls = false;
+      saveProject();
+      hidePlayerControlsBtn.classList.add("hidden");
+      showPlayerControlsBtn.classList.remove("hidden");
+      mountPlayerWithCast(cast, {
+        startAt: isNum(cast.start) ? cast.start : 0,
+        markers: buildMarkersForCast(cast),
+        controls: false
+      });
+    });
+
+    showPlayerControlsBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast) return;
+      cast.playerControls = true;
+      saveProject();
+      showPlayerControlsBtn.classList.add("hidden");
+      hidePlayerControlsBtn.classList.remove("hidden");
+      mountPlayerWithCast(cast, {
+        startAt: isNum(cast.start) ? cast.start : 0,
+        markers: buildMarkersForCast(cast),
+        controls: true
+      });
+    });
+
+    downloadGhostBtn.addEventListener("click", () => downloadTextFile("ghost-snippets.txt", buildGhostSnippetsText()));
+
+    copyGhostBtn.addEventListener("click", async () => {
+      renderGhostSnippets();
+      const text = ghostText.value || "";
+      try {
+        await copyTextCompat(text);
+        elStatus.textContent = "copied";
+        setTimeout(() => (elStatus.textContent = "ready"), 900);
+      } catch (_) {
+        elStatus.textContent = "copy failed";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+      }
+    });
+
+    downloadProjectBtn.addEventListener("click", () => downloadTextFile("asciinema-project.json", JSON.stringify(project, null, 2)));
+    importProjectBtn.addEventListener("click", () => importProjectFile.click());
+    clearProjectBtn.addEventListener("click", () => {
+      if (!confirm("Clear all casts and local project data?")) return;
+      for (const c of project.casts) {
+        if (c.type === "file" && c.src && String(c.src).startsWith("blob:")) {
+          try { URL.revokeObjectURL(c.src); } catch (_) {}
+        }
+      }
+      project = { activeId: null, casts: [] };
+      try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+      renderCastSelect();
+      mountActiveCast();
+      renderAllSnippets();
+    });
+
+    importProjectFile.addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+
+        for (const c of project.casts) {
+          if (c.type === "file" && c.src && String(c.src).startsWith("blob:")) {
+            try { URL.revokeObjectURL(c.src); } catch (_) {}
+          }
+        }
+
+        if (!parsed || !Array.isArray(parsed.casts) || !parsed.casts.length) throw new Error("bad project");
+        project = parsed;
+        if (!project.activeId && project.casts.length) project.activeId = project.casts[0].id;
+
+        saveProject();
+        renderCastSelect();
+        mountActiveCast();
+      } catch (_) {
+        elStatus.textContent = "import failed";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+      } finally {
+        importProjectFile.value = "";
+      }
+    });
+
+    setInterval(async () => {
+      if (!player) { elCur.textContent = "–"; return; }
+      try {
+        const t = await player.getCurrentTime();
+        elCur.textContent = isNum(t) ? `${t.toFixed(2)}s  (${fmtTimecode(t)})` : "–";
+      } catch (_) {
+        elCur.textContent = "–";
+      }
+    }, 150);
+
+    renderCastSelect();
+    renderAllSnippets();
+    focusUrlInputIfEmpty();
+    ensurePlayerReady().then((ok) => {
+      if (!ok) {
+        elStatus.textContent = "player load failed";
+        return;
+      }
+      mountActiveCast();
+    });
+  </script>
+</body>
+</html>
