@@ -10,7 +10,18 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/asciinema-player@3.14.0/dist/bundle/asciinema-player.css" />
 
   <style>
-    :root { color-scheme: dark; }
+    :root {
+      color-scheme: dark;
+      --accent: #3b82f6;
+      --accent-strong: #2563eb;
+      --panel-bg: rgba(18,18,18,0.9);
+      --panel-border: rgba(255,255,255,0.1);
+      --panel-shadow: 0 12px 28px rgba(0,0,0,0.45);
+      --field-bg: rgba(255,255,255,0.05);
+      --field-border: rgba(255,255,255,0.12);
+      --button-bg: rgba(255,255,255,0.07);
+      --button-border: rgba(255,255,255,0.12);
+    }
     html, body { height: 100%; }
     body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
     .wrap { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
@@ -43,25 +54,25 @@
       right: 12px;
       bottom: 12px;
       width: min(560px, calc(100vw - 24px));
-      border: 1px solid rgba(255,255,255,0.16);
+      border: 1px solid var(--panel-border);
       border-radius: 12px;
-      background: rgba(15,15,15,0.92);
+      background: var(--panel-bg);
       backdrop-filter: blur(10px);
       padding: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      box-shadow: var(--panel-shadow);
       max-height: calc(100vh - 24px);
       overflow: auto;
     }
     .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
-    .row + .row { margin-top: 10px; }
+    .row + .row { margin-top: 12px; }
     .grow { flex: 1 1 auto; }
     .kpi { font-variant-numeric: tabular-nums; font-size: 12px; opacity: 0.9; }
     label { font-size: 12px; opacity: 0.85; display:block; margin-bottom: 4px; }
     input[type="text"], select, textarea {
       padding: 8px 10px;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--field-border);
+      background: var(--field-bg);
       color: inherit;
       outline: none;
     }
@@ -72,16 +83,26 @@
     button {
       padding: 8px 10px;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--button-border);
+      background: var(--button-bg);
       color: inherit;
       cursor: pointer;
       user-select: none;
     }
     button:hover { background: rgba(255,255,255,0.12); }
     button.primary { background: rgba(255,255,255,0.16); }
+    button.cta {
+      background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+      border-color: rgba(59,130,246,0.6);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(37,99,235,0.25);
+    }
+    button.cta:hover {
+      background: linear-gradient(180deg, #60a5fa, var(--accent));
+      box-shadow: 0 8px 20px rgba(37,99,235,0.35);
+    }
     button.danger { background: rgba(255,80,80,0.16); border-color: rgba(255,80,80,0.22); }
-    .sep { height: 1px; background: rgba(255,255,255,0.12); margin: 10px 0; }
+    .sep { height: 1px; background: rgba(255,255,255,0.08); margin: 14px 0; }
     .small { font-size: 12px; opacity: 0.8; }
     .pill {
       padding: 2px 8px;
@@ -91,10 +112,10 @@
     }
     .hidden { display: none !important; }
     .dropzone {
-      border: 1px dashed rgba(255,255,255,0.24);
+      border: 1px dashed rgba(255,255,255,0.18);
       border-radius: 12px;
       padding: 10px;
-      background: rgba(255,255,255,0.03);
+      background: rgba(255,255,255,0.02);
       font-size: 12px;
       opacity: 0.9;
     }
@@ -114,7 +135,9 @@
       border: 1px solid rgba(255,255,255,0.16);
       box-shadow: 0 10px 30px rgba(0,0,0,0.45);
     }
-    .twoCol { display:grid; grid-template-columns: minmax(260px, 1fr) auto; gap: 10px; align-items:end; }
+    .urlRow { align-items: center; flex-wrap: nowrap; }
+    .urlRow input[type="text"] { flex: 1 1 auto; min-width: 0; }
+    .urlRow button { flex: 0 0 auto; }
     .urlBox {
       padding: 10px;
       border-radius: 12px;
@@ -128,6 +151,7 @@
       border-color: rgba(255,255,255,0.35);
       box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
     }
+    #previewImageInput { width: 100%; }
     .kbd {
       padding: 1px 6px;
       border-radius: 6px;
@@ -143,8 +167,26 @@
       margin: 0;
       padding: 10px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.1);
       background: rgba(255,255,255,0.04);
+    }
+    .header-row { justify-content: space-between; align-items: center; }
+    .header-row label { margin: 0; }
+    .icon-btn {
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.6;
     }
   </style>
 </head>
@@ -182,19 +224,36 @@
         </div>
       </div>
 
-      <div class="twoCol urlBox">
-        <div>
-          <label>Add cast URL (.cast)</label>
+      <div class="urlBox">
+        <label>Add cast URL (.cast)</label>
+        <div class="row urlRow">
           <input class="mono" type="text" id="addUrlInput" placeholder="https://…/something.cast" />
-          <div class="mini muted urlHint">Paste a URL and press Enter or click Add. <strong>Use a URL to export Ghost snippets.</strong></div>
+          <button id="addUrlBtn" class="primary">Add</button>
         </div>
-        <button id="addUrlBtn" class="primary">Add</button>
+        <div class="mini muted urlHint">Paste a URL and press Enter or click Add. <strong>Use a URL to export Ghost snippets.</strong></div>
       </div>
 
       <div class="dropzone" id="dropzone">
         <strong>Drag & drop local <span class="mono">.cast</span> files</strong> to preview.
         <div class="note">Local files will not export to Ghost snippets. Use a URL to embed.</div>
       </div>
+
+      <div class="sep"></div>
+
+      <div class="row">
+        <div class="grow">
+          <label>Preview image URL (for email fallback)</label>
+          <input class="mono" type="text" id="previewImageInput" placeholder="https://…/preview.png (auto-detected for asciinema.org)" />
+          <div class="mini muted">Shows in emails when JavaScript is disabled. Leave empty for text fallback.</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="capturePreviewBtn">1. Capture preview at current time</button>
+        <button id="downloadPreviewBtn" disabled>2. Download preview image</button>
+        <button id="useDataUrlBtn" disabled>3. Use embedded data URL</button>
+      </div>
+      <div class="mini muted">First capture, then choose download or embed</div>
 
       <div class="sep"></div>
 
@@ -237,14 +296,30 @@
 
       <div class="row">
         <div class="grow">
-          <label>Config snippet (current cast)</label>
+          <div class="row header-row">
+            <label>Config snippet (current cast)</label>
+            <button class="icon-btn" id="copyCfgIcon" aria-label="Copy config" title="Copy config">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                <rect x="4" y="4" width="11" height="11" rx="2"></rect>
+              </svg>
+            </button>
+          </div>
           <pre class="codebox mono small" id="configSnippet"></pre>
         </div>
       </div>
 
       <div class="row">
         <div class="grow">
-          <label>Ghost snippets (all URL casts)</label>
+          <div class="row header-row">
+            <label>Ghost snippets (all URL casts)</label>
+            <button class="icon-btn" id="copyGhostIcon" aria-label="Copy Ghost snippets" title="Copy Ghost snippets">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                <rect x="4" y="4" width="11" height="11" rx="2"></rect>
+              </svg>
+            </button>
+          </div>
           <div class="mini muted">Only URL casts are included (local files are for preview).</div>
           <div class="mini muted">URL casts: <span class="mono" id="urlCastCount">0</span></div>
           <div class="mini mono muted" id="urlCastList">–</div>
@@ -253,7 +328,7 @@
       </div>
 
       <div class="row">
-        <button class="primary" id="downloadGhostBtn">Download Ghost snippets</button>
+        <button class="primary cta" id="downloadGhostBtn">Download Ghost snippets</button>
         <button id="copyGhostBtn">Copy Ghost snippets</button>
       </div>
 
@@ -387,12 +462,23 @@
 
     function makeCastFromUrl(url) {
       const src = normalizeUrl(url);
-      return { id: randomId(), label: guessLabelFromSrc(src), type: "url", src, start: null, end: null, controls: "auto", playerControls: true };
+      const previewImage = detectPreviewImage(src);
+      return { id: randomId(), label: guessLabelFromSrc(src), type: "url", src, previewImage, start: null, end: null, controls: "auto", playerControls: true };
+    }
+
+    function detectPreviewImage(castUrl) {
+      // Auto-detect asciinema.org URLs and generate .png preview
+      if (!castUrl) return "";
+      const match = castUrl.match(/asciinema\.org\/a\/([^/.]+)\.cast/);
+      if (match) {
+        return `https://asciinema.org/a/${match[1]}.png`;
+      }
+      return "";
     }
 
     function makeCastFromFile(file) {
       const objUrl = URL.createObjectURL(file);
-      return { id: randomId(), label: file.name || "local.cast", type: "file", src: objUrl, fileName: file.name || "local.cast", start: null, end: null, controls: "auto", playerControls: true };
+      return { id: randomId(), label: file.name || "local.cast", type: "file", src: objUrl, fileName: file.name || "local.cast", previewImage: "", start: null, end: null, controls: "auto", playerControls: true };
     }
 
     function loadProject() {
@@ -431,6 +517,12 @@
     const addUrlInput = document.getElementById("addUrlInput");
     const addUrlBtn = document.getElementById("addUrlBtn");
     const dropzone = document.getElementById("dropzone");
+    const previewImageInput = document.getElementById("previewImageInput");
+    const capturePreviewBtn = document.getElementById("capturePreviewBtn");
+    const downloadPreviewBtn = document.getElementById("downloadPreviewBtn");
+    const useDataUrlBtn = document.getElementById("useDataUrlBtn");
+
+    let capturedPreviewBlob = null;
 
     const startTcInput = document.getElementById("startTcInput");
     const endTcInput = document.getElementById("endTcInput");
@@ -448,6 +540,7 @@
     const loopSelBtn = document.getElementById("loopSelBtn");
     const pauseBtn = document.getElementById("pauseBtn");
     const copyCfgBtn = document.getElementById("copyCfgBtn");
+    const copyCfgIcon = document.getElementById("copyCfgIcon");
 
     const applyMarkersBtn = document.getElementById("applyMarkersBtn");
     const hidePlayerControlsBtn = document.getElementById("hidePlayerControlsBtn");
@@ -459,6 +552,7 @@
     const urlCastList = document.getElementById("urlCastList");
     const downloadGhostBtn = document.getElementById("downloadGhostBtn");
     const copyGhostBtn = document.getElementById("copyGhostBtn");
+    const copyGhostIcon = document.getElementById("copyGhostIcon");
 
     const downloadProjectBtn = document.getElementById("downloadProjectBtn");
     const importProjectBtn = document.getElementById("importProjectBtn");
@@ -533,6 +627,169 @@
       const src = cast.src || "";
       const shortSrc = src.length > 90 ? src.slice(0, 40) + "…" + src.slice(-40) : src;
       castMeta.textContent = `id=${cast.id}  type=${cast.type}  src=${shortSrc || "—"}`;
+      previewImageInput.value = cast.previewImage || "";
+    }
+
+    async function capturePlayerPreview() {
+      if (!player) {
+        console.error("Capture failed: No player loaded");
+        elStatus.textContent = "no player loaded";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+        return null;
+      }
+
+      try {
+        const playerEl = document.querySelector("#player .ap-player");
+        console.log("Player element:", playerEl);
+        if (!playerEl) {
+          console.error("Capture failed: Player element not found");
+          elStatus.textContent = "player element not found";
+          setTimeout(() => (elStatus.textContent = "ready"), 1200);
+          return null;
+        }
+
+        // Find the terminal container which has the actual content
+        const terminalEl = playerEl.querySelector(".ap-term") || playerEl.querySelector(".ap-terminal");
+        console.log("Terminal element:", terminalEl);
+        if (!terminalEl) {
+          console.error("Capture failed: Terminal element not found");
+          elStatus.textContent = "terminal element not found";
+          setTimeout(() => (elStatus.textContent = "ready"), 1200);
+          return null;
+        }
+
+        const termRect = terminalEl.getBoundingClientRect();
+        if (!termRect.width || !termRect.height) {
+          console.error("Capture failed: Terminal dimensions unavailable");
+          elStatus.textContent = "terminal size not ready";
+          setTimeout(() => (elStatus.textContent = "ready"), 1200);
+          return null;
+        }
+
+        const dpr = window.devicePixelRatio || 1;
+        const outputCanvas = document.createElement("canvas");
+        outputCanvas.width = Math.round(termRect.width * dpr);
+        outputCanvas.height = Math.round(termRect.height * dpr);
+
+        const ctx = outputCanvas.getContext("2d");
+        if (!ctx) {
+          console.error("Capture failed: Could not get canvas context");
+          elStatus.textContent = "canvas context failed";
+          setTimeout(() => (elStatus.textContent = "ready"), 1200);
+          return null;
+        }
+
+        ctx.scale(dpr, dpr);
+        ctx.imageSmoothingEnabled = false;
+
+        const isTransparent = (color) => !color || color === "transparent" || color === "rgba(0, 0, 0, 0)";
+        const playerBg = getComputedStyle(playerEl).backgroundColor;
+        ctx.fillStyle = isTransparent(playerBg) ? "#000" : playerBg;
+        ctx.fillRect(0, 0, termRect.width, termRect.height);
+
+        const canvases = Array.from(terminalEl.querySelectorAll("canvas"));
+        console.log("Found canvases:", canvases.length, canvases);
+        for (const canvas of canvases) {
+          const rect = canvas.getBoundingClientRect();
+          ctx.drawImage(canvas, rect.x - termRect.x, rect.y - termRect.y, rect.width, rect.height);
+        }
+
+        const svgLayer = terminalEl.querySelector("svg.ap-term-symbols");
+        if (svgLayer) {
+          const svgRect = svgLayer.getBoundingClientRect();
+          const clone = svgLayer.cloneNode(true);
+          clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+          clone.setAttribute("width", svgRect.width);
+          clone.setAttribute("height", svgRect.height);
+          const svgString = new XMLSerializer().serializeToString(clone);
+          const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgString);
+          await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              ctx.drawImage(img, svgRect.x - termRect.x, svgRect.y - termRect.y, svgRect.width, svgRect.height);
+              resolve();
+            };
+            img.onerror = resolve;
+            img.src = svgUrl;
+          });
+        }
+
+        const textLayer = terminalEl.querySelector("pre.ap-term-text");
+        if (textLayer) {
+          ctx.textBaseline = "top";
+          ctx.textAlign = "left";
+          const spans = Array.from(textLayer.querySelectorAll(".ap-line span"));
+          let lastFont = "";
+          for (const span of spans) {
+            const rect = span.getBoundingClientRect();
+            if (!rect.width || !rect.height) continue;
+            const style = getComputedStyle(span);
+            const x = rect.x - termRect.x;
+            const y = rect.y - termRect.y;
+            const alpha = parseFloat(style.opacity || "1");
+            ctx.globalAlpha = Number.isFinite(alpha) ? alpha : 1;
+
+            if (!isTransparent(style.backgroundColor)) {
+              ctx.fillStyle = style.backgroundColor;
+              ctx.fillRect(x, y, rect.width, rect.height);
+            }
+
+            const text = span.textContent || "";
+            if (text.length) {
+              const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`.replace(/\s+/g, " ").trim();
+              if (font && font !== lastFont) {
+                ctx.font = font;
+                lastFont = font;
+              }
+              ctx.fillStyle = style.color;
+              if (text.trim().length) {
+                ctx.fillText(text, x, y);
+              }
+
+              if (style.textDecorationLine && style.textDecorationLine !== "none") {
+                const lineWidth = Math.max(1, Math.round(parseFloat(style.fontSize) / 12));
+                ctx.strokeStyle = style.color;
+                ctx.lineWidth = lineWidth;
+                if (style.textDecorationLine.includes("underline")) {
+                  const underlineY = y + rect.height - lineWidth;
+                  ctx.beginPath();
+                  ctx.moveTo(x, underlineY);
+                  ctx.lineTo(x + rect.width, underlineY);
+                  ctx.stroke();
+                }
+                if (style.textDecorationLine.includes("line-through")) {
+                  const strikeY = y + rect.height / 2;
+                  ctx.beginPath();
+                  ctx.moveTo(x, strikeY);
+                  ctx.lineTo(x + rect.width, strikeY);
+                  ctx.stroke();
+                }
+              }
+            }
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        return new Promise((resolve) => {
+          outputCanvas.toBlob((blob) => {
+            if (blob) {
+              console.log(`Preview captured successfully: ${outputCanvas.width}×${outputCanvas.height}, ${(blob.size / 1024).toFixed(1)}KB`);
+              elStatus.textContent = `preview captured (${Math.round(termRect.width)}×${Math.round(termRect.height)})`;
+              setTimeout(() => (elStatus.textContent = "ready"), 900);
+            } else {
+              console.error("Capture failed: toBlob returned null");
+              elStatus.textContent = "capture failed";
+              setTimeout(() => (elStatus.textContent = "ready"), 1200);
+            }
+            resolve(blob);
+          }, "image/png");
+        });
+      } catch (e) {
+        console.error("Capture exception:", e);
+        elStatus.textContent = "capture error: " + e.message;
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+        return null;
+      }
     }
 
     function updateCastFromInputs() {
@@ -709,7 +966,20 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
 
       const contentParts = [];
       for (const c of urlCasts) {
-        contentParts.push(`<div id="${safeDivIdForCast(c)}"></div>`);
+        const divId = safeDivIdForCast(c);
+        const previewImg = c.previewImage || "";
+
+        if (previewImg) {
+          // Email-friendly fallback: image that gets replaced by player when JS runs
+          contentParts.push(`<div id="${divId}">`);
+          contentParts.push(`  <img src="${previewImg}" alt="${c.label || 'Terminal recording'}" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px;">`);
+          contentParts.push(`</div>`);
+        } else {
+          // Text fallback when no preview image
+          contentParts.push(`<div id="${divId}">`);
+          contentParts.push(`  <p style="padding: 20px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px;">Terminal recording: ${c.label || 'loading...'}</p>`);
+          contentParts.push(`</div>`);
+        }
         contentParts.push(`<div style="height:16px"></div>`);
       }
       if (contentParts.length) contentParts.pop();
@@ -887,6 +1157,75 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
     startTcInput.addEventListener("change", updateCastFromInputs);
     endTcInput.addEventListener("change", updateCastFromInputs);
 
+    previewImageInput.addEventListener("change", () => {
+      const cast = getActiveCast();
+      if (!cast) return;
+      cast.previewImage = normalizeUrl(previewImageInput.value);
+      saveProject();
+      renderGhostSnippets();
+    });
+
+    capturePreviewBtn.addEventListener("click", async () => {
+      elStatus.textContent = "capturing...";
+      const blob = await capturePlayerPreview();
+      if (blob) {
+        capturedPreviewBlob = blob;
+        downloadPreviewBtn.disabled = false;
+        useDataUrlBtn.disabled = false;
+        downloadPreviewBtn.textContent = `2. Download preview image ✓`;
+        useDataUrlBtn.textContent = `3. Use embedded data URL ✓`;
+      } else {
+        elStatus.textContent = "capture failed - check console";
+        setTimeout(() => (elStatus.textContent = "ready"), 2000);
+      }
+    });
+
+    downloadPreviewBtn.addEventListener("click", () => {
+      if (!capturedPreviewBlob) {
+        elStatus.textContent = "capture a preview first";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+        return;
+      }
+      const cast = getActiveCast();
+      const filename = cast ? `${cast.label.replace(/\.cast$/, "")}-preview.png` : "preview.png";
+      const url = URL.createObjectURL(capturedPreviewBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+      elStatus.textContent = "preview downloaded";
+      setTimeout(() => (elStatus.textContent = "ready"), 900);
+    });
+
+    useDataUrlBtn.addEventListener("click", async () => {
+      if (!capturedPreviewBlob) {
+        elStatus.textContent = "capture a preview first";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+        return;
+      }
+      const cast = getActiveCast();
+      if (!cast) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        cast.previewImage = dataUrl;
+        previewImageInput.value = dataUrl.slice(0, 80) + "… (data URL)";
+        saveProject();
+        renderGhostSnippets();
+        elStatus.textContent = "data URL embedded";
+        setTimeout(() => (elStatus.textContent = "ready"), 900);
+      };
+      reader.onerror = () => {
+        elStatus.textContent = "data URL failed";
+        setTimeout(() => (elStatus.textContent = "ready"), 1200);
+      };
+      reader.readAsDataURL(capturedPreviewBlob);
+    });
+
     insertStartBtn.addEventListener("click", async () => {
       await insertCurrentStart();
     });
@@ -968,7 +1307,7 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
 
     pauseBtn.addEventListener("click", () => { if (player) player.pause(); });
 
-    copyCfgBtn.addEventListener("click", async () => {
+    async function copyConfigSnippet() {
       renderCurrentConfigSnippet();
       const text = configSnippet.textContent || "";
       try {
@@ -979,7 +1318,10 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
         elStatus.textContent = "copy failed";
         setTimeout(() => (elStatus.textContent = "ready"), 1200);
       }
-    });
+    }
+
+    if (copyCfgBtn) copyCfgBtn.addEventListener("click", copyConfigSnippet);
+    if (copyCfgIcon) copyCfgIcon.addEventListener("click", copyConfigSnippet);
 
     applyMarkersBtn.addEventListener("click", () => {
       const cast = getActiveCast();
@@ -1024,7 +1366,7 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
 
     downloadGhostBtn.addEventListener("click", () => downloadTextFile("ghost-snippets.txt", buildGhostSnippetsText()));
 
-    copyGhostBtn.addEventListener("click", async () => {
+    async function copyGhostSnippet() {
       renderGhostSnippets();
       const text = ghostText.value || "";
       try {
@@ -1035,7 +1377,10 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
         elStatus.textContent = "copy failed";
         setTimeout(() => (elStatus.textContent = "ready"), 1200);
       }
-    });
+    }
+
+    if (copyGhostBtn) copyGhostBtn.addEventListener("click", copyGhostSnippet);
+    if (copyGhostIcon) copyGhostIcon.addEventListener("click", copyGhostSnippet);
 
     downloadProjectBtn.addEventListener("click", () => downloadTextFile("asciinema-project.json", JSON.stringify(project, null, 2)));
     importProjectBtn.addEventListener("click", () => importProjectFile.click());
@@ -1090,6 +1435,10 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
         elCur.textContent = "–";
       }
     }, 150);
+
+    // Initialize preview buttons as disabled
+    downloadPreviewBtn.disabled = true;
+    useDataUrlBtn.disabled = true;
 
     renderCastSelect();
     renderAllSnippets();
