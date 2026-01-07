@@ -11,32 +11,104 @@
 
   <style>
     :root {
-      color-scheme: dark;
+      color-scheme: light dark;
       --accent: #3b82f6;
       --accent-strong: #2563eb;
-      --panel-bg: rgba(18,18,18,0.9);
-      --panel-border: rgba(255,255,255,0.1);
-      --panel-shadow: 0 12px 28px rgba(0,0,0,0.45);
+      --page-bg: #0c0d0f;
+      --text-color: #eef2f7;
+      --muted-color: rgba(255,255,255,0.7);
+      --panel-bg: rgba(18,18,18,0.92);
+      --panel-border: rgba(255,255,255,0.08);
+      --panel-shadow: 0 -12px 24px rgba(0,0,0,0.35);
+      --panel-height: 360px;
+      --success: #22c55e;
+      --success-strong: #16a34a;
       --field-bg: rgba(255,255,255,0.05);
       --field-border: rgba(255,255,255,0.12);
-      --button-bg: rgba(255,255,255,0.07);
+      --button-bg: rgba(255,255,255,0.08);
       --button-border: rgba(255,255,255,0.12);
+      --button-bg-strong: rgba(255,255,255,0.16);
+      --divider: rgba(255,255,255,0.1);
+      --pill-bg: rgba(255,255,255,0.06);
+      --drop-bg: rgba(255,255,255,0.02);
+      --drop-border: rgba(255,255,255,0.18);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --page-bg: #f6f7fb;
+        --text-color: #0f172a;
+        --muted-color: rgba(15,23,42,0.65);
+        --panel-bg: rgba(255,255,255,0.95);
+        --panel-border: rgba(15,23,42,0.12);
+        --panel-shadow: 0 -10px 24px rgba(15,23,42,0.12);
+        --field-bg: rgba(15,23,42,0.04);
+        --field-border: rgba(15,23,42,0.12);
+        --button-bg: rgba(15,23,42,0.06);
+        --button-border: rgba(15,23,42,0.12);
+        --button-bg-strong: rgba(15,23,42,0.12);
+        --divider: rgba(15,23,42,0.12);
+        --pill-bg: rgba(15,23,42,0.05);
+        --drop-bg: rgba(15,23,42,0.03);
+        --drop-border: rgba(15,23,42,0.18);
+      }
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --page-bg: #0c0d0f;
+      --text-color: #eef2f7;
+      --muted-color: rgba(255,255,255,0.7);
+      --panel-bg: rgba(18,18,18,0.92);
+      --panel-border: rgba(255,255,255,0.08);
+      --panel-shadow: 0 -12px 24px rgba(0,0,0,0.35);
+      --field-bg: rgba(255,255,255,0.05);
+      --field-border: rgba(255,255,255,0.12);
+      --button-bg: rgba(255,255,255,0.08);
+      --button-border: rgba(255,255,255,0.12);
+      --button-bg-strong: rgba(255,255,255,0.16);
+      --divider: rgba(255,255,255,0.1);
+      --pill-bg: rgba(255,255,255,0.06);
+      --drop-bg: rgba(255,255,255,0.02);
+      --drop-border: rgba(255,255,255,0.18);
+    }
+    html[data-theme="light"] {
+      color-scheme: light;
+      --page-bg: #f6f7fb;
+      --text-color: #0f172a;
+      --muted-color: rgba(15,23,42,0.65);
+      --panel-bg: rgba(255,255,255,0.95);
+      --panel-border: rgba(15,23,42,0.12);
+      --panel-shadow: 0 -10px 24px rgba(15,23,42,0.12);
+      --field-bg: rgba(15,23,42,0.04);
+      --field-border: rgba(15,23,42,0.12);
+      --button-bg: rgba(15,23,42,0.06);
+      --button-border: rgba(15,23,42,0.12);
+      --button-bg-strong: rgba(15,23,42,0.12);
+      --divider: rgba(15,23,42,0.12);
+      --pill-bg: rgba(15,23,42,0.05);
+      --drop-bg: rgba(15,23,42,0.03);
+      --drop-border: rgba(15,23,42,0.18);
     }
     html, body { height: 100%; }
-    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
-    .wrap { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: var(--page-bg);
+      color: var(--text-color);
+    }
+    .wrap { display: flex; flex-direction: column; height: 100vh; }
     header {
       padding: 12px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
+      border-bottom: 1px solid var(--divider);
       display:flex; gap:12px; align-items:center;
     }
     header .hint { opacity: 0.8; font-size: 12px; }
-    #player { padding: 14px; min-height: 0; overflow: hidden; position: relative; }
+    #player { padding: 14px; min-height: 0; overflow: hidden; position: relative; flex: 1 1 auto; }
     #player .ap-player { max-width: 100%; max-height: 100%; }
     #player .player-empty {
       position: absolute;
       inset: 14px;
-      border: 1px dashed rgba(255,255,255,0.2);
+      border: 1px dashed var(--divider);
       border-radius: 12px;
       display: flex;
       flex-direction: column;
@@ -50,22 +122,112 @@
     }
 
     .panel {
-      position: fixed;
-      right: 12px;
-      bottom: 12px;
-      width: min(560px, calc(100vw - 24px));
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
+      position: relative;
+      width: 100%;
+      border-top: 1px solid var(--panel-border);
+      border-radius: 16px 16px 0 0;
       background: var(--panel-bg);
       backdrop-filter: blur(10px);
-      padding: 12px;
+      padding: 8px 14px 12px;
       box-shadow: var(--panel-shadow);
-      max-height: calc(100vh - 24px);
-      overflow: auto;
+      height: var(--panel-height, 360px);
+      flex: 0 0 var(--panel-height, 360px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: height 180ms ease, transform 180ms ease, opacity 180ms ease;
     }
-    .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+    body.panel-collapsed .panel {
+      height: 0px;
+      flex-basis: 0px;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-top-color: transparent;
+      transform: translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    body.panel-resizing {
+      cursor: ns-resize;
+    }
+    body.panel-resizing .panel {
+      transition: none;
+      cursor: ns-resize;
+    }
+    body.panel-resizing .panel * {
+      cursor: ns-resize;
+    }
+    .drawer-handle {
+      height: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: ns-resize;
+      user-select: none;
+      touch-action: none;
+    }
+    .drawer-handle::before {
+      content: "";
+      width: 48px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--divider);
+      transition: background 120ms ease, width 120ms ease;
+    }
+    .drawer-handle:hover::before,
+    .drawer-handle:active::before,
+    body.panel-resizing .drawer-handle::before {
+      background: rgba(59,130,246,0.7);
+      width: 64px;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--divider);
+      padding-bottom: 8px;
+      position: relative;
+    }
+    .panel-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .tab-btn {
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      background: transparent;
+      border-color: transparent;
+    }
+    .tab-btn:hover {
+      background: var(--button-bg);
+      border-color: var(--button-border);
+    }
+    .tab-btn.active {
+      background: var(--button-bg-strong);
+      border-color: var(--button-border);
+    }
+    .panel-body {
+      padding-top: 10px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1 1 auto;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap: wrap; min-width: 0; }
     .row + .row { margin-top: 12px; }
-    .grow { flex: 1 1 auto; }
+    .grow { flex: 1 1 auto; min-width: 0; }
+    .field-stack { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .field-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+    .field-row input { flex: 0 0 auto; width: 22ch; min-width: 18ch; }
     .kpi { font-variant-numeric: tabular-nums; font-size: 12px; opacity: 0.9; }
     label { font-size: 12px; opacity: 0.85; display:block; margin-bottom: 4px; }
     input[type="text"], select, textarea {
@@ -75,6 +237,8 @@
       background: var(--field-bg);
       color: inherit;
       outline: none;
+      min-width: 0;
+      max-width: 100%;
     }
     select { min-width: 220px; }
     textarea { width: 100%; min-height: 140px; resize: vertical; }
@@ -90,7 +254,7 @@
       user-select: none;
     }
     button:hover { background: rgba(255,255,255,0.12); }
-    button.primary { background: rgba(255,255,255,0.16); }
+    button.primary { background: var(--button-bg-strong); }
     button.cta {
       background: linear-gradient(180deg, var(--accent), var(--accent-strong));
       border-color: rgba(59,130,246,0.6);
@@ -101,23 +265,33 @@
       background: linear-gradient(180deg, #60a5fa, var(--accent));
       box-shadow: 0 8px 20px rgba(37,99,235,0.35);
     }
+    button.success {
+      background: linear-gradient(180deg, var(--success), var(--success-strong));
+      border-color: rgba(34,197,94,0.55);
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(22,163,74,0.22);
+    }
+    button.success:hover {
+      background: linear-gradient(180deg, #4ade80, var(--success));
+      box-shadow: 0 8px 18px rgba(22,163,74,0.32);
+    }
     button.danger { background: rgba(255,80,80,0.16); border-color: rgba(255,80,80,0.22); }
-    .sep { height: 1px; background: rgba(255,255,255,0.08); margin: 14px 0; }
-    .small { font-size: 12px; opacity: 0.8; }
+    .sep { height: 1px; background: var(--divider); margin: 14px 0; }
+    .small { font-size: 12px; color: var(--muted-color); }
     .pill {
       padding: 2px 8px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--divider);
+      background: var(--pill-bg);
     }
     .hidden { display: none !important; }
     .dropzone {
-      border: 1px dashed rgba(255,255,255,0.18);
+      border: 1px dashed var(--drop-border);
       border-radius: 12px;
       padding: 10px;
-      background: rgba(255,255,255,0.02);
+      background: var(--drop-bg);
       font-size: 12px;
-      opacity: 0.9;
+      color: inherit;
     }
     .dropzone strong { font-weight: 600; }
     .dropzone .note { opacity: 0.75; }
@@ -131,9 +305,9 @@
       bottom: 12px;
       padding: 10px 12px;
       border-radius: 12px;
-      background: rgba(15,15,15,0.92);
-      border: 1px solid rgba(255,255,255,0.16);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--panel-shadow);
     }
     .urlRow { align-items: center; flex-wrap: nowrap; }
     .urlRow input[type="text"] { flex: 1 1 auto; min-width: 0; }
@@ -141,11 +315,11 @@
     .urlBox {
       padding: 10px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--panel-border);
+      background: var(--field-bg);
     }
     .urlBox input[type="text"] { width: 100%; }
-    .urlBox .urlHint { color: rgba(255,255,255,0.85); }
+    .urlBox .urlHint { color: var(--muted-color); }
     .urlBox .urlHint strong { font-weight: 600; }
     .urlBox input[type="text"].highlight {
       border-color: rgba(255,255,255,0.35);
@@ -155,20 +329,20 @@
     .kbd {
       padding: 1px 6px;
       border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid var(--divider);
       font-size: 11px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      background: rgba(255,255,255,0.06);
+      background: var(--pill-bg);
     }
-    .muted { opacity: 0.75; }
-    .mini { font-size: 11px; opacity: 0.75; }
+    .muted { color: var(--muted-color); }
+    .mini { font-size: 11px; color: var(--muted-color); }
     .codebox {
       white-space: pre-wrap;
       margin: 0;
       padding: 10px;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--panel-border);
+      background: var(--field-bg);
     }
     .header-row { justify-content: space-between; align-items: center; }
     .header-row label { margin: 0; }
@@ -180,6 +354,7 @@
       align-items: center;
       justify-content: center;
       border-radius: 8px;
+      position: relative;
     }
     .icon-btn svg {
       width: 16px;
@@ -187,6 +362,80 @@
       stroke: currentColor;
       fill: none;
       stroke-width: 1.6;
+    }
+    .close-btn {
+      width: 34px;
+      height: 34px;
+    }
+    .close-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    .icon-btn[data-copied="true"]::after {
+      content: "Copied";
+      position: absolute;
+      right: 34px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--divider);
+      background: var(--pill-bg);
+      color: var(--text-color);
+      white-space: nowrap;
+    }
+    button[data-copied="true"]:not(.icon-btn) {
+      border-color: rgba(59,130,246,0.6);
+      color: var(--text-color);
+    }
+    .shortcut-popover {
+      position: absolute;
+      right: 8px;
+      top: 46px;
+      min-width: 220px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      background: var(--panel-bg);
+      box-shadow: var(--panel-shadow);
+      z-index: 10;
+    }
+    .shortcut-list {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+    }
+    .snippet-cta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      background: var(--field-bg);
+    }
+    .snippet-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .snippet-block { margin-top: 14px; }
+    .snippet-details {
+      margin-top: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      background: var(--field-bg);
+      padding: 8px 10px;
+    }
+    .snippet-details summary {
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--muted-color);
+      list-style: none;
+    }
+    .snippet-details summary::-webkit-details-marker { display: none; }
+    .snippet-details[open] summary {
+      margin-bottom: 8px;
+      color: var(--text-color);
     }
   </style>
 </head>
@@ -200,147 +449,240 @@
 
     <div id="player"></div>
 
-    <button class="floating hidden" id="showPanelBtn">Show controls <span class="kbd">Alt/Option+H</span></button>
+    <button class="floating hidden" id="showPanelBtn">Show drawer <span class="kbd">Alt/Option+H</span></button>
 
     <div class="panel" id="panel">
-      <div class="row">
-        <div class="grow kpi">
-          <div>Current: <span class="mono" id="curTime">–</span></div>
-          <div>Duration: <span class="mono" id="durTime">–</span></div>
+      <div class="drawer-handle" id="drawerHandle" aria-label="Resize drawer" title="Drag to resize"></div>
+      <div class="panel-header">
+        <div class="tabs" role="tablist" aria-label="Panel tabs">
+          <button class="tab-btn active" data-tab="casts" role="tab" aria-controls="tab-casts" aria-selected="true">Add Casts</button>
+          <button class="tab-btn" data-tab="range" role="tab" aria-controls="tab-range">Set Start / End</button>
+          <button class="tab-btn" data-tab="preview" role="tab" aria-controls="tab-preview">Set Preview Image</button>
+          <button class="tab-btn" data-tab="settings" role="tab" aria-controls="tab-settings">Settings</button>
+          <button class="tab-btn" data-tab="snippets" role="tab" aria-controls="tab-snippets">Code Snippets</button>
         </div>
-        <button id="hidePanelBtn">Hide <span class="kbd">Alt/Option+H</span></button>
+        <div class="panel-actions">
+          <button class="icon-btn" id="shortcutsBtn" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="6" width="18" height="12" rx="2"></rect>
+              <rect x="6" y="9" width="3" height="3" rx="1"></rect>
+              <rect x="11" y="9" width="3" height="3" rx="1"></rect>
+              <rect x="16" y="9" width="3" height="3" rx="1"></rect>
+              <rect x="6" y="14" width="8" height="2" rx="1"></rect>
+            </svg>
+          </button>
+          <button class="icon-btn close-btn" id="hidePanelBtn" aria-label="Close drawer" title="Close (Alt/Option+H)">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="shortcut-popover hidden" id="shortcutsPopover">
+          <div class="mini muted" style="margin-bottom: 6px;">Shortcuts</div>
+          <div class="shortcut-list">
+            <div><span class="kbd">Alt/Option+S</span> Insert current → Start</div>
+            <div><span class="kbd">Alt/Option+E</span> Insert current → End</div>
+            <div><span class="kbd">Alt/Option+H</span> Toggle panel</div>
+          </div>
+        </div>
       </div>
 
-      <div class="sep"></div>
-
-      <div class="row">
-        <div class="grow">
-          <label>Cast</label>
+      <div class="panel-body">
+        <section class="tab-panel active" id="tab-casts" data-tab="casts" role="tabpanel">
           <div class="row">
-            <select id="castSelect"></select>
-            <button id="deleteCastBtn" class="danger">Delete</button>
+            <div class="grow">
+              <label>Cast</label>
+              <div class="row">
+                <select id="castSelect"></select>
+                <button id="deleteCastBtn" class="danger">Delete</button>
+              </div>
+              <div class="mini mono muted" id="castMeta">–</div>
+            </div>
           </div>
-          <div class="mini mono muted" id="castMeta">–</div>
-        </div>
-      </div>
 
-      <div class="urlBox">
-        <label>Add cast URL (.cast)</label>
-        <div class="row urlRow">
-          <input class="mono" type="text" id="addUrlInput" placeholder="https://…/something.cast" />
-          <button id="addUrlBtn" class="primary">Add</button>
-        </div>
-        <div class="mini muted urlHint">Paste a URL and press Enter or click Add. <strong>Use a URL to export Ghost snippets.</strong></div>
-      </div>
-
-      <div class="dropzone" id="dropzone">
-        <strong>Drag & drop local <span class="mono">.cast</span> files</strong> to preview.
-        <div class="note">Local files will not export to Ghost snippets. Use a URL to embed.</div>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div class="grow">
-          <label>Preview image URL (for email fallback)</label>
-          <input class="mono" type="text" id="previewImageInput" placeholder="https://…/preview.png (auto-detected for asciinema.org)" />
-          <div class="mini muted">Shows in emails when JavaScript is disabled. Leave empty for text fallback.</div>
-        </div>
-      </div>
-
-      <div class="row">
-        <button class="primary" id="capturePreviewBtn">1. Capture preview at current time</button>
-        <button id="downloadPreviewBtn" disabled>2. Download preview image</button>
-        <button id="useDataUrlBtn" disabled>3. Use embedded data URL</button>
-      </div>
-      <div class="mini muted">First capture, then choose download or embed</div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div class="grow">
-          <label>Start (timecode or seconds)</label>
-          <input class="mono small" type="text" id="startTcInput" placeholder="hh:mm:ss.mmm or seconds" />
-          <div class="mini">Seconds: <span class="mono" id="startSeconds">–</span></div>
-        </div>
-        <button class="primary" id="insertStartBtn">Insert current → Start <span class="kbd">Alt/Option+S</span></button>
-        <button id="seekStartBtn">Seek start</button>
-        <button id="clearStartBtn" class="danger">Clear</button>
-      </div>
-
-      <div class="row">
-        <div class="grow">
-          <label>End (timecode or seconds)</label>
-          <input class="mono small" type="text" id="endTcInput" placeholder="hh:mm:ss.mmm or seconds" />
-          <div class="mini">Seconds: <span class="mono" id="endSeconds">–</span></div>
-        </div>
-        <button class="primary" id="insertEndBtn">Insert current → End <span class="kbd">Alt/Option+E</span></button>
-        <button id="seekEndBtn">Seek end</button>
-        <button id="clearEndBtn" class="danger">Clear</button>
-      </div>
-
-      <div class="row">
-        <button class="primary" id="playSelBtn">Play selection</button>
-        <button id="loopSelBtn">Loop: off</button>
-        <button id="pauseBtn">Pause</button>
-        <button id="copyCfgBtn">Copy config</button>
-      </div>
-
-      <div class="row">
-        <button id="applyMarkersBtn">Apply markers to player</button>
-        <button id="hidePlayerControlsBtn">Player controls: off</button>
-        <button id="showPlayerControlsBtn" class="hidden">Player controls: on</button>
-      </div>
-
-      <div class="sep"></div>
-
-      <div class="row">
-        <div class="grow">
-          <div class="row header-row">
-            <label>Config snippet (current cast)</label>
-            <button class="icon-btn" id="copyCfgIcon" aria-label="Copy config" title="Copy config">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
-                <rect x="4" y="4" width="11" height="11" rx="2"></rect>
-              </svg>
-            </button>
+          <div class="urlBox">
+            <label>Add cast URL (.cast)</label>
+            <div class="row urlRow">
+              <input class="mono" type="text" id="addUrlInput" placeholder="https://…/something.cast" />
+              <button id="addUrlBtn" class="primary">Add</button>
+            </div>
+            <div class="mini muted urlHint">Paste a URL and press Enter or click Add. <strong>Use a URL to export Ghost snippets.</strong></div>
+            <div class="mini muted urlHint">Adding more than one cast will generate embeds for all of them in a single post.</div>
           </div>
-          <pre class="codebox mono small" id="configSnippet"></pre>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="grow">
-          <div class="row header-row">
-            <label>Ghost snippets (all URL casts)</label>
-            <button class="icon-btn" id="copyGhostIcon" aria-label="Copy Ghost snippets" title="Copy Ghost snippets">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
-                <rect x="4" y="4" width="11" height="11" rx="2"></rect>
-              </svg>
-            </button>
+          <div class="dropzone hidden" id="dropzone">
+            <strong>Drag & drop local <span class="mono">.cast</span> files</strong> to preview (testing only).
+            <div class="note">Local files are added by filename only; replace with hosted URLs before publishing.</div>
           </div>
-          <div class="mini muted">Only URL casts are included (local files are for preview).</div>
-          <div class="mini muted">URL casts: <span class="mono" id="urlCastCount">0</span></div>
-          <div class="mini mono muted" id="urlCastList">–</div>
-          <textarea class="mono small" id="ghostText" spellcheck="false"></textarea>
-        </div>
-      </div>
+        </section>
 
-      <div class="row">
-        <button class="primary cta" id="downloadGhostBtn">Download Ghost snippets</button>
-        <button id="copyGhostBtn">Copy Ghost snippets</button>
-      </div>
+        <section class="tab-panel" id="tab-range" data-tab="range" role="tabpanel">
+          <div class="row">
+            <div class="grow field-stack">
+              <label>Start (timecode or seconds)</label>
+              <div class="field-row">
+                <input class="mono small" type="text" id="startTcInput" placeholder="hh:mm:ss.mmm or seconds" />
+                <button class="success" id="insertStartBtn">Insert current → Start <span class="kbd">Alt/Option+S</span></button>
+                <button id="seekStartBtn">Seek start</button>
+                <button id="clearStartBtn" class="danger">Clear</button>
+              </div>
+              <div class="mini">Seconds: <span class="mono" id="startSeconds">–</span></div>
+            </div>
+          </div>
 
-      <div class="row">
-        <button id="downloadProjectBtn">Download project JSON</button>
-        <button id="importProjectBtn">Import project JSON</button>
-        <button id="clearProjectBtn" class="danger">Clear project data</button>
-        <input type="file" id="importProjectFile" accept="application/json" class="hidden" />
-      </div>
+          <div class="row">
+            <div class="grow field-stack">
+              <label>End (timecode or seconds)</label>
+              <div class="field-row">
+                <input class="mono small" type="text" id="endTcInput" placeholder="hh:mm:ss.mmm or seconds" />
+                <button class="success" id="insertEndBtn">Insert current → End <span class="kbd">Alt/Option+E</span></button>
+                <button id="seekEndBtn">Seek end</button>
+                <button id="clearEndBtn" class="danger">Clear</button>
+              </div>
+              <div class="mini">Seconds: <span class="mono" id="endSeconds">–</span></div>
+            </div>
+          </div>
 
-      <div class="small">
-        Stored locally in your browser (<span class="mono">localStorage</span>) + exportable as JSON.
+          <div class="row">
+            <button class="primary" id="playSelBtn">Play selection</button>
+            <button id="loopSelBtn">Loop: off</button>
+            <button id="pauseBtn">Pause</button>
+          </div>
+
+          <div class="row">
+            <button id="applyMarkersBtn">Apply markers to player</button>
+            <button id="hidePlayerControlsBtn">Player controls: off</button>
+            <button id="showPlayerControlsBtn" class="hidden">Player controls: on</button>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-preview" data-tab="preview" role="tabpanel">
+          <div class="row">
+            <div class="grow">
+              <label>Preview image URL (for email fallback)</label>
+              <input class="mono" type="text" id="previewImageInput" placeholder="https://.../my-cast.png (auto-detected from .cast URL)" />
+              <div class="mini muted">Shows in emails when JavaScript is disabled. Clear to use text fallback.</div>
+              <div class="mini muted">Using the embedded data URL will add the image directly into the snippet for the selected cast.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <label class="mini">
+              <input type="checkbox" id="usePreviewPosterToggle" checked />
+              Use preview image as the player poster on web embeds (default)
+            </label>
+          </div>
+
+          <div class="row">
+            <button class="primary" id="capturePreviewBtn">1. Capture preview at current time</button>
+            <button id="downloadPreviewBtn" disabled>2. Download preview image</button>
+            <button id="useDataUrlBtn" disabled>3. Use embedded data URL</button>
+            <button id="clearPreviewBtn">Clear preview image</button>
+          </div>
+          <div class="mini muted">First capture, then choose download or embed.</div>
+          <div class="mini muted">For URL casts, previews default to the <span class="mono">.cast</span> filename with <span class="mono">.png</span>. Downloads assume you'll upload the image next to the <span class="mono">.cast</span> file.</div>
+
+          <div class="snippet-block hidden" id="previewDataBlock">
+            <div class="row header-row">
+              <label>Embedded data URL (current cast)</label>
+              <button class="icon-btn" id="copyPreviewDataBtn" aria-label="Copy embedded data URL" title="Copy embedded data URL">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                  <rect x="4" y="4" width="11" height="11" rx="2"></rect>
+                </svg>
+              </button>
+            </div>
+            <textarea class="mono small" id="previewDataUrl" spellcheck="false" readonly></textarea>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-settings" data-tab="settings" role="tabpanel">
+          <div class="row">
+            <div class="grow">
+              <label>Local testing</label>
+              <label class="mini">
+                <input type="checkbox" id="enableDropzoneToggle" />
+                Enable drag & drop local <span class="mono">.cast</span> files (testing only)
+              </label>
+              <div class="mini muted">Local files are included by filename only; replace with hosted URLs before publishing.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="grow kpi">
+              <div>Current: <span class="mono" id="curTime">–</span></div>
+              <div>Duration: <span class="mono" id="durTime">–</span></div>
+            </div>
+            <div class="grow">
+              <label>Theme</label>
+              <select id="themeSelect">
+                <option value="auto">Auto</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <button id="downloadProjectBtn">Download project JSON</button>
+            <button id="importProjectBtn">Import project JSON</button>
+            <button id="clearProjectBtn" class="danger">Clear project data</button>
+            <input type="file" id="importProjectFile" accept="application/json" class="hidden" />
+          </div>
+
+          <div class="small">
+            Stored locally in your browser (<span class="mono">localStorage</span>) + exportable as JSON.
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-snippets" data-tab="snippets" role="tabpanel">
+          <div class="snippet-cta">
+            <div>
+              <strong>Ghost snippets</strong>
+              <div class="mini muted">Download the snippets and paste into your Ghost post.</div>
+            </div>
+            <div class="snippet-actions">
+              <button class="primary cta" id="downloadGhostBtn">Download Ghost snippets</button>
+              <button id="copyGhostBtn">Copy Ghost snippets</button>
+            </div>
+          </div>
+
+          <div class="snippet-block">
+            <div class="row header-row">
+              <label>Ghost snippets (all casts)</label>
+              <button class="icon-btn" id="copyGhostIcon" aria-label="Copy Ghost snippets" title="Copy Ghost snippets">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                  <rect x="4" y="4" width="11" height="11" rx="2"></rect>
+                </svg>
+              </button>
+            </div>
+            <div class="mini muted">Local files are added by filename only; replace with hosted URLs before publishing.</div>
+            <div class="mini muted">Casts: <span class="mono" id="urlCastCount">0</span></div>
+            <div class="mini mono muted" id="urlCastList">–</div>
+            <details class="snippet-details">
+              <summary>Show snippet</summary>
+              <textarea class="mono small" id="ghostText" spellcheck="false"></textarea>
+            </details>
+          </div>
+
+          <div class="snippet-block">
+            <div class="row header-row">
+              <label>Config snippet (current cast)</label>
+              <button class="icon-btn" id="copyCfgIcon" aria-label="Copy config" title="Copy config">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                  <rect x="4" y="4" width="11" height="11" rx="2"></rect>
+                </svg>
+              </button>
+            </div>
+            <details class="snippet-details">
+              <summary>Show snippet</summary>
+              <pre class="codebox mono small" id="configSnippet"></pre>
+            </details>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -442,6 +784,7 @@
       const hasCast = project.casts.some(c => c.type === "url" && c.src && c.src.startsWith("http"));
       if (hasCast) return;
       if (!addUrlInput.value) {
+        setActiveTab("casts");
         addUrlInput.classList.add("highlight");
         addUrlInput.focus();
         addUrlInput.select();
@@ -460,25 +803,144 @@
       }
     }
 
-    function makeCastFromUrl(url) {
-      const src = normalizeUrl(url);
-      const previewImage = detectPreviewImage(src);
-      return { id: randomId(), label: guessLabelFromSrc(src), type: "url", src, previewImage, start: null, end: null, controls: "auto", playerControls: true };
+    function lastPathSegmentFromUrl(src) {
+      try {
+        const url = new URL(src);
+        const last = url.pathname.split("/").filter(Boolean).pop() || "";
+        if (!last) return "";
+        try { return decodeURIComponent(last); } catch (_) { return last; }
+      } catch (_) {
+        return "";
+      }
+    }
+
+    function normalizePreviewFilename(name) {
+      const raw = String(name || "").trim();
+      if (!raw) return "preview.png";
+      const base = raw.split("?")[0].split("#")[0];
+      if (!base) return "preview.png";
+      if (base.toLowerCase().endsWith(".png")) return base;
+      if (base.toLowerCase().endsWith(".cast")) return base.replace(/\.cast$/i, ".png");
+      return `${base}.png`;
+    }
+
+    function previewFilenameForCast(cast) {
+      if (!cast) return "preview.png";
+      if (cast.type === "url" && cast.src) {
+        const fromUrl = lastPathSegmentFromUrl(cast.src);
+        if (fromUrl) return normalizePreviewFilename(fromUrl);
+      }
+      if (cast.fileName) return normalizePreviewFilename(cast.fileName);
+      if (cast.label) return normalizePreviewFilename(cast.label);
+      return "preview.png";
+    }
+
+    function buildPreviewUrlFromCast(cast, previewFilename) {
+      if (!cast || cast.type !== "url" || !cast.src || !cast.src.startsWith("http")) return "";
+      try {
+        const url = new URL(cast.src);
+        url.pathname = url.pathname.replace(/[^/]*$/, previewFilename);
+        return url.toString();
+      } catch (_) {
+        return "";
+      }
     }
 
     function detectPreviewImage(castUrl) {
-      // Auto-detect asciinema.org URLs and generate .png preview
       if (!castUrl) return "";
-      const match = castUrl.match(/asciinema\.org\/a\/([^/.]+)\.cast/);
-      if (match) {
-        return `https://asciinema.org/a/${match[1]}.png`;
+      try {
+        const url = new URL(castUrl);
+        const last = url.pathname.split("/").filter(Boolean).pop() || "";
+        if (!/\.cast$/i.test(last)) return "";
+        const previewName = normalizePreviewFilename(last);
+        url.pathname = url.pathname.replace(/[^/]*$/, previewName);
+        return url.toString();
+      } catch (_) {
+        return "";
       }
       return "";
     }
 
+    function autoPreviewUrlFromCast(cast) {
+      if (!cast || cast.previewImageDisabled) return "";
+      if (cast.type !== "url" || !cast.src || !cast.src.startsWith("http")) return "";
+      return detectPreviewImage(cast.src);
+    }
+
+    function previewPosterForCast(cast) {
+      if (!cast || cast.usePreviewPoster === false) return "";
+      const previewImg = cast.previewImage || autoPreviewUrlFromCast(cast);
+      return previewImg ? String(previewImg) : "";
+    }
+
+    function applyPosterToPlayer(container, posterUrl, playerInstance) {
+      if (!container || !posterUrl || !playerInstance) return;
+      const ensurePoster = () => {
+        const playerEl = container.querySelector(".ap-player");
+        if (!playerEl) return null;
+        let posterEl = playerEl.querySelector(".ap-preview-poster");
+        if (!posterEl) {
+          posterEl = document.createElement("img");
+          posterEl.className = "ap-preview-poster";
+          posterEl.alt = "Preview image";
+          posterEl.style.position = "absolute";
+          posterEl.style.inset = "0";
+          posterEl.style.width = "100%";
+          posterEl.style.height = "100%";
+          posterEl.style.objectFit = "cover";
+          posterEl.style.zIndex = "2";
+          posterEl.style.pointerEvents = "none";
+          playerEl.appendChild(posterEl);
+        }
+        posterEl.src = posterUrl;
+        return posterEl;
+      };
+      const clearPoster = () => {
+        const posterEl = container.querySelector(".ap-preview-poster");
+        if (posterEl) posterEl.remove();
+      };
+      const posterEl = ensurePoster();
+      if (!posterEl) {
+        playerInstance.addEventListener("ready", ensurePoster);
+      }
+      playerInstance.addEventListener("play", clearPoster);
+      playerInstance.addEventListener("playing", clearPoster);
+    }
+
+    function snippetSrcForCast(cast) {
+      if (!cast) return "";
+      if (cast.type === "url" && cast.src && cast.src.startsWith("http")) return cast.src;
+      if (cast.type === "file") return cast.fileName || cast.label || "";
+      return "";
+    }
+
+    function hydrateCastPreview(cast) {
+      if (!cast || cast.previewImage || cast.previewImageDisabled) return false;
+      const autoPreview = autoPreviewUrlFromCast(cast);
+      if (!autoPreview) return false;
+      cast.previewImage = autoPreview;
+      cast.previewImageDisabled = false;
+      return true;
+    }
+
+    function hydrateProjectPreviews(proj) {
+      if (!proj || !Array.isArray(proj.casts)) return false;
+      let changed = false;
+      for (const cast of proj.casts) {
+        if (hydrateCastPreview(cast)) changed = true;
+      }
+      return changed;
+    }
+
+    function makeCastFromUrl(url) {
+      const src = normalizeUrl(url);
+      const previewImage = detectPreviewImage(src);
+      return { id: randomId(), label: guessLabelFromSrc(src), type: "url", src, previewImage, previewImageDisabled: false, usePreviewPoster: true, start: null, end: null, controls: "auto", playerControls: true };
+    }
+
     function makeCastFromFile(file) {
       const objUrl = URL.createObjectURL(file);
-      return { id: randomId(), label: file.name || "local.cast", type: "file", src: objUrl, fileName: file.name || "local.cast", previewImage: "", start: null, end: null, controls: "auto", playerControls: true };
+      return { id: randomId(), label: file.name || "local.cast", type: "file", src: objUrl, fileName: file.name || "local.cast", previewImage: "", usePreviewPoster: true, start: null, end: null, controls: "auto", playerControls: true };
     }
 
     function loadProject() {
@@ -498,6 +960,7 @@
     const defaultProject = { activeId: null, casts: [] };
     let project = loadProject() || defaultProject;
     if (!project.activeId && project.casts.length) project.activeId = project.casts[0].id;
+    if (hydrateProjectPreviews(project)) saveProject();
 
     let player = null;
     let playerDuration = null;
@@ -507,7 +970,6 @@
     const elStatus = document.getElementById("status");
     const elCur = document.getElementById("curTime");
     const elDur = document.getElementById("durTime");
-    const elPanel = document.getElementById("panel");
     const showPanelBtn = document.getElementById("showPanelBtn");
     const hidePanelBtn = document.getElementById("hidePanelBtn");
 
@@ -517,10 +979,16 @@
     const addUrlInput = document.getElementById("addUrlInput");
     const addUrlBtn = document.getElementById("addUrlBtn");
     const dropzone = document.getElementById("dropzone");
+    const enableDropzoneToggle = document.getElementById("enableDropzoneToggle");
     const previewImageInput = document.getElementById("previewImageInput");
     const capturePreviewBtn = document.getElementById("capturePreviewBtn");
     const downloadPreviewBtn = document.getElementById("downloadPreviewBtn");
     const useDataUrlBtn = document.getElementById("useDataUrlBtn");
+    const clearPreviewBtn = document.getElementById("clearPreviewBtn");
+    const usePreviewPosterToggle = document.getElementById("usePreviewPosterToggle");
+    const previewDataBlock = document.getElementById("previewDataBlock");
+    const previewDataUrl = document.getElementById("previewDataUrl");
+    const copyPreviewDataBtn = document.getElementById("copyPreviewDataBtn");
 
     let capturedPreviewBlob = null;
 
@@ -558,6 +1026,201 @@
     const importProjectBtn = document.getElementById("importProjectBtn");
     const clearProjectBtn = document.getElementById("clearProjectBtn");
     const importProjectFile = document.getElementById("importProjectFile");
+
+    const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
+    const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+    const shortcutsBtn = document.getElementById("shortcutsBtn");
+    const shortcutsPopover = document.getElementById("shortcutsPopover");
+    const themeSelect = document.getElementById("themeSelect");
+    const drawerHandle = document.getElementById("drawerHandle");
+
+    const PANEL_MIN_HEIGHT = 240;
+    const PANEL_DEFAULT_HEIGHT = 360;
+    let panelHeight = PANEL_DEFAULT_HEIGHT;
+
+    function flashCopied(el, label = "Copied") {
+      if (!el) return;
+      if (el.classList.contains("icon-btn")) {
+        el.dataset.copied = "true";
+        clearTimeout(el._copiedTimer);
+        el._copiedTimer = setTimeout(() => { el.dataset.copied = ""; }, 1200);
+        return;
+      }
+      const original = el.dataset.label || el.textContent;
+      if (!el.dataset.label) el.dataset.label = original;
+      el.textContent = label;
+      el.dataset.copied = "true";
+      clearTimeout(el._copiedTimer);
+      el._copiedTimer = setTimeout(() => {
+        el.textContent = el.dataset.label || original;
+        el.dataset.copied = "";
+      }, 1200);
+    }
+
+    function resetPreviewCapture() {
+      capturedPreviewBlob = null;
+      downloadPreviewBtn.disabled = true;
+      useDataUrlBtn.disabled = true;
+      downloadPreviewBtn.textContent = "2. Download preview image";
+      useDataUrlBtn.textContent = "3. Use embedded data URL";
+    }
+
+    function getMaxPanelHeight() {
+      const header = document.querySelector("header");
+      const headerHeight = header ? header.offsetHeight : 0;
+      const minPlayer = 140;
+      return Math.max(PANEL_MIN_HEIGHT, window.innerHeight - headerHeight - minPlayer);
+    }
+
+    function applyPanelHeight(height, persist = true) {
+      panelHeight = clamp(height, PANEL_MIN_HEIGHT, getMaxPanelHeight());
+      document.documentElement.style.setProperty("--panel-height", `${panelHeight}px`);
+      if (persist) {
+        try { localStorage.setItem("panelHeight", String(panelHeight)); } catch (_) {}
+      }
+    }
+
+    function openPanel() {
+      document.body.classList.remove("panel-collapsed");
+      showPanelBtn.classList.add("hidden");
+      applyPanelHeight(panelHeight, false);
+      try { localStorage.setItem("panelOpen", "true"); } catch (_) {}
+      setTimeout(() => window.dispatchEvent(new Event("resize")), 220);
+    }
+
+    function closePanel() {
+      document.body.classList.add("panel-collapsed");
+      showPanelBtn.classList.remove("hidden");
+      document.documentElement.style.setProperty("--panel-height", "0px");
+      try { localStorage.setItem("panelOpen", "false"); } catch (_) {}
+      setTimeout(() => window.dispatchEvent(new Event("resize")), 220);
+    }
+
+    function setActiveTab(tabId) {
+      if (!tabId) return;
+      for (const btn of tabButtons) {
+        const active = btn.dataset.tab === tabId;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-selected", String(active));
+      }
+      for (const panel of tabPanels) {
+        const active = panel.dataset.tab === tabId;
+        panel.classList.toggle("active", active);
+      }
+      try { localStorage.setItem("activeTab", tabId); } catch (_) {}
+    }
+
+    function initTabs() {
+      if (!tabButtons.length) return;
+      for (const btn of tabButtons) {
+        btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+      }
+      let stored = null;
+      try { stored = localStorage.getItem("activeTab"); } catch (_) {}
+      if (stored && tabButtons.some(btn => btn.dataset.tab === stored)) {
+        setActiveTab(stored);
+      } else {
+        setActiveTab(tabButtons[0].dataset.tab);
+      }
+    }
+
+    function applyTheme(mode) {
+      if (mode === "light" || mode === "dark") {
+        document.documentElement.dataset.theme = mode;
+      } else {
+        delete document.documentElement.dataset.theme;
+      }
+    }
+
+    function initTheme() {
+      if (!themeSelect) return;
+      let stored = "auto";
+      try { stored = localStorage.getItem("themePreference") || "auto"; } catch (_) {}
+      themeSelect.value = stored;
+      applyTheme(stored);
+      themeSelect.addEventListener("change", () => {
+        const value = themeSelect.value || "auto";
+        try { localStorage.setItem("themePreference", value); } catch (_) {}
+        applyTheme(value);
+      });
+    }
+
+    function initShortcutsPopover() {
+      if (!shortcutsBtn || !shortcutsPopover) return;
+      shortcutsBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        shortcutsPopover.classList.toggle("hidden");
+      });
+      document.addEventListener("click", (e) => {
+        if (shortcutsPopover.classList.contains("hidden")) return;
+        if (shortcutsPopover.contains(e.target) || shortcutsBtn.contains(e.target)) return;
+        shortcutsPopover.classList.add("hidden");
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") shortcutsPopover.classList.add("hidden");
+      });
+    }
+
+    function updateDropzoneVisibility(enabled) {
+      if (!dropzone) return;
+      dropzone.classList.toggle("hidden", !enabled);
+    }
+
+    function initDropzoneToggle() {
+      if (!enableDropzoneToggle) return;
+      let enabled = false;
+      try { enabled = localStorage.getItem("enableDropzone") === "true"; } catch (_) {}
+      enableDropzoneToggle.checked = enabled;
+      updateDropzoneVisibility(enabled);
+      enableDropzoneToggle.addEventListener("change", () => {
+        const on = enableDropzoneToggle.checked;
+        updateDropzoneVisibility(on);
+        try { localStorage.setItem("enableDropzone", on ? "true" : "false"); } catch (_) {}
+      });
+    }
+
+    function initDrawerResize() {
+      if (!drawerHandle) return;
+      drawerHandle.addEventListener("pointerdown", (e) => {
+        if (document.body.classList.contains("panel-collapsed")) openPanel();
+        document.body.classList.add("panel-resizing");
+        drawerHandle.setPointerCapture(e.pointerId);
+
+        const onMove = (event) => {
+          const newHeight = window.innerHeight - event.clientY;
+          applyPanelHeight(newHeight, false);
+        };
+
+        const onUp = (event) => {
+          drawerHandle.releasePointerCapture(event.pointerId);
+          document.body.classList.remove("panel-resizing");
+          applyPanelHeight(panelHeight, true);
+          window.dispatchEvent(new Event("resize"));
+          drawerHandle.removeEventListener("pointermove", onMove);
+          drawerHandle.removeEventListener("pointerup", onUp);
+          drawerHandle.removeEventListener("pointercancel", onUp);
+        };
+
+        drawerHandle.addEventListener("pointermove", onMove);
+        drawerHandle.addEventListener("pointerup", onUp);
+        drawerHandle.addEventListener("pointercancel", onUp);
+      });
+    }
+
+    function initPanelState() {
+      let storedHeight = null;
+      let storedOpen = null;
+      try {
+        storedHeight = Number(localStorage.getItem("panelHeight"));
+        storedOpen = localStorage.getItem("panelOpen");
+      } catch (_) {}
+      if (Number.isFinite(storedHeight) && storedHeight > 0) {
+        panelHeight = storedHeight;
+      }
+      applyPanelHeight(panelHeight, false);
+      if (storedOpen === "false") closePanel();
+      else openPanel();
+    }
 
     function getActiveCast() {
       return project.casts.find(c => c.id === project.activeId) || null;
@@ -620,6 +1283,8 @@
 
     function updateInputsFromCast(cast) {
       if (!cast) return;
+      const previewUpdated = hydrateCastPreview(cast);
+      if (previewUpdated) saveProject();
       startTcInput.value = isNum(cast.start) ? fmtTimecode(cast.start) : "";
       endTcInput.value = isNum(cast.end) ? fmtTimecode(cast.end) : "";
       startSeconds.textContent = isNum(cast.start) ? cast.start.toFixed(2) : "–";
@@ -627,7 +1292,24 @@
       const src = cast.src || "";
       const shortSrc = src.length > 90 ? src.slice(0, 40) + "…" + src.slice(-40) : src;
       castMeta.textContent = `id=${cast.id}  type=${cast.type}  src=${shortSrc || "—"}`;
-      previewImageInput.value = cast.previewImage || "";
+      const previewValue = cast.previewImage || "";
+      if (previewValue.startsWith("data:")) {
+        previewImageInput.value = previewValue.slice(0, 80) + "… (data URL)";
+      } else {
+        previewImageInput.value = previewValue;
+      }
+      if (usePreviewPosterToggle) {
+        usePreviewPosterToggle.checked = cast.usePreviewPoster !== false;
+      }
+      updatePreviewDataDisplay(cast);
+    }
+
+    function updatePreviewDataDisplay(cast) {
+      if (!previewDataBlock || !previewDataUrl) return;
+      const value = cast && cast.previewImage ? String(cast.previewImage) : "";
+      const isDataUrl = value.startsWith("data:");
+      previewDataBlock.classList.toggle("hidden", !isDataUrl);
+      previewDataUrl.value = isDataUrl ? value : "";
     }
 
     async function capturePlayerPreview() {
@@ -819,13 +1501,18 @@
 
       const container = document.getElementById("player");
       container.innerHTML = "";
-
-      player = AsciinemaPlayer.create(cast.src, container, {
+      const baseOpts = {
         preload: true,
         fit: "both",
-        controls: cast.playerControls !== false,
+        controls: cast.playerControls !== false
+      };
+
+      player = AsciinemaPlayer.create(cast.src, container, {
+        ...baseOpts,
         ...opts
       });
+      const posterUrl = previewPosterForCast(cast);
+      if (posterUrl) applyPosterToPlayer(container, posterUrl, player);
 
       elStatus.textContent = "loading…";
       const durPoll = setInterval(async () => {
@@ -856,6 +1543,7 @@
       const cast = getActiveCast();
       if (!cast) {
         clearPlayer();
+        resetPreviewCapture();
         elStatus.textContent = "add a .cast URL or drop a file";
         elDur.textContent = "–";
         updateInputsFromCast({ start: null, end: null, id: "—", type: "—", src: "" });
@@ -908,7 +1596,7 @@
       const empty = document.createElement("div");
       empty.className = "player-empty";
       empty.innerHTML = [
-        "<div>In the sidebar, paste a .cast URL or use the dropzone for local preview.</div>",
+        "<div>In the bottom pane, in the Add Casts tab, paste a link to one or more .cast URLs.</div>",
         "<div class=\"mini\">Shortcuts: <span class=\"kbd\">Alt/Option+S</span> start, <span class=\"kbd\">Alt/Option+E</span> end, <span class=\"kbd\">Alt/Option+H</span> toggle panel.</div>"
       ].join("");
       container.appendChild(empty);
@@ -943,17 +1631,19 @@
         ? `markers: [[${cast.start.toFixed(2)}, "Start"], [${cast.end.toFixed(2)}, "End"]]`
         : `markers: []`;
 
-      configSnippet.textContent =
-`// AsciinemaPlayer.create(src, element, opts)
-{
-  startAt: ${isNum(cast.start) ? cast.start.toFixed(2) : 0},
-  controls: "auto",
-  ${markers}
-}
-
-// picked range:
-start = ${s}  (${fmtTimecode(cast.start)})
-end   = ${e}  (${fmtTimecode(cast.end)})`;
+      const snippetLines = [
+        `// AsciinemaPlayer.create(src, element, opts)`,
+        `{`,
+        `  startAt: ${isNum(cast.start) ? cast.start.toFixed(2) : 0},`,
+        `  controls: "auto",`
+      ];
+      snippetLines.push(`  ${markers}`);
+      snippetLines.push(`}`);
+      snippetLines.push(``);
+      snippetLines.push(`// picked range:`);
+      snippetLines.push(`start = ${s}  (${fmtTimecode(cast.start)})`);
+      snippetLines.push(`end   = ${e}  (${fmtTimecode(cast.end)})`);
+      configSnippet.textContent = snippetLines.join("\n");
     }
 
     function safeDivIdForCast(cast) {
@@ -963,11 +1653,12 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
     function buildGhostSnippetsText() {
       const urlCasts = project.casts.filter(c => c.type === "url" && c.src && c.src.startsWith("http"));
       const fileCasts = project.casts.filter(c => c.type === "file");
+      const snippetCasts = urlCasts.concat(fileCasts);
 
       const contentParts = [];
-      for (const c of urlCasts) {
+      for (const c of snippetCasts) {
         const divId = safeDivIdForCast(c);
-        const previewImg = c.previewImage || "";
+        const previewImg = c.previewImage || autoPreviewUrlFromCast(c);
 
         if (previewImg) {
           // Email-friendly fallback: image that gets replaced by player when JS runs
@@ -994,15 +1685,19 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       footerLines.push(`(function () {`);
       footerLines.push(`  if (!window.AsciinemaPlayer) return;`);
 
-      for (const c of urlCasts) {
+      for (const c of snippetCasts) {
         const divId = safeDivIdForCast(c);
         const markers = buildMarkersForCast(c);
         const startAt = isNum(c.start) ? c.start : 0;
+        const src = snippetSrcForCast(c);
+        const poster = previewPosterForCast(c);
+        if (!src) continue;
 
         footerLines.push(`  var el_${c.id} = document.getElementById(${JSON.stringify(divId)});`);
         footerLines.push(`  if (el_${c.id}) {`);
-        footerLines.push(`    AsciinemaPlayer.create(`);
-        footerLines.push(`      ${JSON.stringify(c.src)},`);
+        footerLines.push(`    el_${c.id}.innerHTML = "";`);
+        footerLines.push(`    var player_${c.id} = AsciinemaPlayer.create(`);
+        footerLines.push(`      ${JSON.stringify(src)},`);
         footerLines.push(`      el_${c.id},`);
         footerLines.push(`      {`);
         footerLines.push(`        startAt: ${Number(startAt).toFixed(2)},`);
@@ -1014,11 +1709,45 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
         }
         footerLines.push(`      }`);
         footerLines.push(`    );`);
+        if (poster) {
+          footerLines.push(`    (function () {`);
+          footerLines.push(`      var posterUrl = ${JSON.stringify(poster)};`);
+          footerLines.push(`      var ensurePoster = function () {`);
+          footerLines.push(`        var playerEl = el_${c.id}.querySelector(".ap-player");`);
+          footerLines.push(`        if (!playerEl) return null;`);
+          footerLines.push(`        var posterEl = playerEl.querySelector(".ap-preview-poster");`);
+          footerLines.push(`        if (!posterEl) {`);
+          footerLines.push(`          posterEl = document.createElement("img");`);
+          footerLines.push(`          posterEl.className = "ap-preview-poster";`);
+          footerLines.push(`          posterEl.alt = "Preview image";`);
+          footerLines.push(`          posterEl.style.position = "absolute";`);
+          footerLines.push(`          posterEl.style.inset = "0";`);
+          footerLines.push(`          posterEl.style.width = "100%";`);
+          footerLines.push(`          posterEl.style.height = "100%";`);
+          footerLines.push(`          posterEl.style.objectFit = "cover";`);
+          footerLines.push(`          posterEl.style.zIndex = "2";`);
+          footerLines.push(`          posterEl.style.pointerEvents = "none";`);
+          footerLines.push(`          playerEl.appendChild(posterEl);`);
+          footerLines.push(`        }`);
+          footerLines.push(`        posterEl.src = posterUrl;`);
+          footerLines.push(`        return posterEl;`);
+          footerLines.push(`      };`);
+          footerLines.push(`      var clearPoster = function () {`);
+          footerLines.push(`        var posterEl = el_${c.id}.querySelector(".ap-preview-poster");`);
+          footerLines.push(`        if (posterEl) posterEl.remove();`);
+          footerLines.push(`      };`);
+          footerLines.push(`      if (!ensurePoster()) {`);
+          footerLines.push(`        player_${c.id}.addEventListener("ready", ensurePoster);`);
+          footerLines.push(`      }`);
+          footerLines.push(`      player_${c.id}.addEventListener("play", clearPoster);`);
+          footerLines.push(`      player_${c.id}.addEventListener("playing", clearPoster);`);
+          footerLines.push(`    })();`);
+        }
         footerLines.push(`  }`);
       }
 
       if (fileCasts.length) {
-        footerLines.push(`  // NOTE: local file casts omitted (Ghost can't fetch blob: URLs).`);
+        footerLines.push(`  // NOTE: local file casts use filenames only; replace with hosted URLs before publishing.`);
       }
 
       footerLines.push(`})();`);
@@ -1028,7 +1757,7 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
 
       return [
         `POST CONTENT (HTML card):`,
-        contentParts.join("\n\n") || `<!-- No URL casts yet (local files are not included) -->`,
+        contentParts.join("\n\n") || `<!-- No casts yet -->`,
         ``,
         `POST HEADER INJECTION:`,
         header,
@@ -1041,12 +1770,16 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
     function renderGhostSnippets() { ghostText.value = buildGhostSnippetsText(); }
     function renderUrlCastCount() {
       const urlCasts = project.casts.filter(c => c.type === "url" && c.src && c.src.startsWith("http"));
-      urlCastCount.textContent = String(urlCasts.length);
-      if (!urlCasts.length) {
+      const fileCasts = project.casts.filter(c => c.type === "file");
+      urlCastCount.textContent = `URL ${urlCasts.length} · Local ${fileCasts.length}`;
+      const listEntries = urlCasts.map(c => c.src).concat(
+        fileCasts.map(c => c.fileName || c.label || "local.cast")
+      );
+      if (!listEntries.length) {
         urlCastList.textContent = "–";
         return;
       }
-      urlCastList.textContent = urlCasts.map(c => c.src).join(" | ");
+      urlCastList.textContent = listEntries.join(" | ");
     }
     function renderAllSnippets() { renderCurrentConfigSnippet(); renderGhostSnippets(); renderUrlCastCount(); }
 
@@ -1063,13 +1796,12 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
     }
 
     function togglePanel() {
-      const isHidden = elPanel.classList.contains("hidden");
-      if (isHidden) {
-        elPanel.classList.remove("hidden");
-        showPanelBtn.classList.add("hidden");
+      const isCollapsed = document.body.classList.contains("panel-collapsed");
+      if (isCollapsed) {
+        openPanel();
       } else {
-        elPanel.classList.add("hidden");
-        showPanelBtn.classList.remove("hidden");
+        closePanel();
+        if (shortcutsPopover) shortcutsPopover.classList.add("hidden");
       }
     }
 
@@ -1160,10 +1892,28 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
     previewImageInput.addEventListener("change", () => {
       const cast = getActiveCast();
       if (!cast) return;
-      cast.previewImage = normalizeUrl(previewImageInput.value);
+      const nextValue = normalizeUrl(previewImageInput.value);
+      if (nextValue.includes("(data URL)") && String(cast.previewImage || "").startsWith("data:")) {
+        previewImageInput.value = String(cast.previewImage).slice(0, 80) + "… (data URL)";
+        return;
+      }
+      cast.previewImage = nextValue;
+      cast.previewImageDisabled = !nextValue;
       saveProject();
       renderGhostSnippets();
+      updatePreviewDataDisplay(cast);
     });
+
+    if (usePreviewPosterToggle) {
+      usePreviewPosterToggle.addEventListener("change", () => {
+        const cast = getActiveCast();
+        if (!cast) return;
+        cast.usePreviewPoster = usePreviewPosterToggle.checked;
+        saveProject();
+        renderAllSnippets();
+        mountActiveCast();
+      });
+    }
 
     capturePreviewBtn.addEventListener("click", async () => {
       elStatus.textContent = "capturing...";
@@ -1187,7 +1937,7 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
         return;
       }
       const cast = getActiveCast();
-      const filename = cast ? `${cast.label.replace(/\.cast$/, "")}-preview.png` : "preview.png";
+      const filename = previewFilenameForCast(cast);
       const url = URL.createObjectURL(capturedPreviewBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -1196,8 +1946,21 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 500);
-      elStatus.textContent = "preview downloaded";
-      setTimeout(() => (elStatus.textContent = "ready"), 900);
+      let previewMessage = "preview downloaded";
+      if (cast && cast.type === "url") {
+        const previewUrl = buildPreviewUrlFromCast(cast, filename);
+        if (previewUrl) {
+          cast.previewImage = previewUrl;
+          cast.previewImageDisabled = false;
+          previewImageInput.value = previewUrl;
+          saveProject();
+          renderGhostSnippets();
+          updatePreviewDataDisplay(cast);
+          previewMessage = "preview downloaded — upload next to .cast";
+        }
+      }
+      elStatus.textContent = previewMessage;
+      setTimeout(() => (elStatus.textContent = "ready"), 1200);
     });
 
     useDataUrlBtn.addEventListener("click", async () => {
@@ -1213,9 +1976,11 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       reader.onload = () => {
         const dataUrl = reader.result;
         cast.previewImage = dataUrl;
+        cast.previewImageDisabled = false;
         previewImageInput.value = dataUrl.slice(0, 80) + "… (data URL)";
         saveProject();
         renderGhostSnippets();
+        updatePreviewDataDisplay(cast);
         elStatus.textContent = "data URL embedded";
         setTimeout(() => (elStatus.textContent = "ready"), 900);
       };
@@ -1225,6 +1990,35 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       };
       reader.readAsDataURL(capturedPreviewBlob);
     });
+
+    clearPreviewBtn.addEventListener("click", () => {
+      const cast = getActiveCast();
+      if (!cast) return;
+      cast.previewImage = "";
+      cast.previewImageDisabled = true;
+      previewImageInput.value = "";
+      saveProject();
+      renderGhostSnippets();
+      updatePreviewDataDisplay(cast);
+      elStatus.textContent = "preview cleared";
+      setTimeout(() => (elStatus.textContent = "ready"), 900);
+    });
+
+    if (copyPreviewDataBtn) {
+      copyPreviewDataBtn.addEventListener("click", async () => {
+        const text = previewDataUrl ? previewDataUrl.value : "";
+        if (!text) return;
+        try {
+          await copyTextCompat(text);
+          elStatus.textContent = "copied";
+          flashCopied(copyPreviewDataBtn);
+          setTimeout(() => (elStatus.textContent = "ready"), 900);
+        } catch (_) {
+          elStatus.textContent = "copy failed";
+          setTimeout(() => (elStatus.textContent = "ready"), 1200);
+        }
+      });
+    }
 
     insertStartBtn.addEventListener("click", async () => {
       await insertCurrentStart();
@@ -1313,6 +2107,8 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       try {
         await copyTextCompat(text);
         elStatus.textContent = "copied";
+        flashCopied(copyCfgBtn);
+        flashCopied(copyCfgIcon);
         setTimeout(() => (elStatus.textContent = "ready"), 900);
       } catch (_) {
         elStatus.textContent = "copy failed";
@@ -1372,6 +2168,8 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       try {
         await copyTextCompat(text);
         elStatus.textContent = "copied";
+        flashCopied(copyGhostBtn);
+        flashCopied(copyGhostIcon);
         setTimeout(() => (elStatus.textContent = "ready"), 900);
       } catch (_) {
         elStatus.textContent = "copy failed";
@@ -1393,6 +2191,7 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       }
       project = { activeId: null, casts: [] };
       try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+      resetPreviewCapture();
       renderCastSelect();
       mountActiveCast();
       renderAllSnippets();
@@ -1415,6 +2214,7 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
         project = parsed;
         if (!project.activeId && project.casts.length) project.activeId = project.casts[0].id;
 
+        hydrateProjectPreviews(project);
         saveProject();
         renderCastSelect();
         mountActiveCast();
@@ -1436,9 +2236,19 @@ end   = ${e}  (${fmtTimecode(cast.end)})`;
       }
     }, 150);
 
+    initTabs();
+    initTheme();
+    initShortcutsPopover();
+    initDrawerResize();
+    initPanelState();
+    initDropzoneToggle();
+    window.addEventListener("resize", () => {
+      if (document.body.classList.contains("panel-collapsed")) return;
+      applyPanelHeight(panelHeight, false);
+    });
+
     // Initialize preview buttons as disabled
-    downloadPreviewBtn.disabled = true;
-    useDataUrlBtn.disabled = true;
+    resetPreviewCapture();
 
     renderCastSelect();
     renderAllSnippets();
